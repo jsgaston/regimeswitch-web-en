@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegimeSwitch Pro — a self-training regime model for MetaTrader 5</title>
+<meta name="description" content="An MT5 expert advisor that trains a hidden Markov model on your own chart data, refuses to trade contexts that fail out-of-sample validation, and runs many symbols and timeframes from a single chart.">
+
+<meta property="og:title" content="RegimeSwitch Pro — a self-training regime model for MetaTrader 5">
+<meta property="og:description" content="It learns what kind of market it is in before it decides whether to trade. Rules documented, limits stated, licence tied to one account.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wisfli.com/regimeswitch/">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+   BEFORE PUBLISHING — search for "PASTE_" and for "you@yourdomain.com"
+  ═══════════════════════════════════════════════════════════════════
+   1. PASTE_STRIPE_SUBSCRIPTION  → Stripe Payment Link, monthly plan
+   2. PASTE_STRIPE_LICENCE       → Stripe Payment Link, one-off licence
+   3. PASTE_PAYPAL_SUBSCRIPTION  → PayPal subscription button link
+   4. PASTE_PAYPAL_LICENCE       → PayPal "Buy Now" button link
+   5. you@yourdomain.com         → your support address (3 places)
+   6. Footer: trading name and NIF (required when selling from Spain)
+   7. report/ReportTester-EURUSD.html → the Strategy Tester report
+
+   IN STRIPE: on each Payment Link add a REQUIRED custom field called
+   "MT5 account number". Without it you cannot issue the key. Set the
+   post-payment redirect to .../activate.html
+
+   IN PAYPAL: paypal.com/buttons → copy the hosted button link. PayPal
+   does not collect the account number, which is why activate.html asks
+   for it.
+  ═══════════════════════════════════════════════════════════════════
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="https://wisfli.com/">Wisfli<span> / RegimeSwitch Pro</span></a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#validation">Validation</a>
+      <a href="#results">Test results</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">Questions</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>It works out what kind of market it is in, then decides whether to trade at all.</h1>
+    <p class="lede">
+      RegimeSwitch Pro fits a hidden Markov model to the price history already sitting in your
+      terminal, splits that history into states, and reads the probability of the next state before
+      it sends an order. There is no downloaded signal and no fixed set of indicator thresholds
+      to go stale.
+    </p>
+    <p class="lede">
+      The part that matters commercially is the part most robots leave out: every symbol and
+      timeframe has to pass an out-of-sample edge test before it is allowed to place a single trade.
+      Contexts that fail sit there and do nothing.
+    </p>
+
+    <div class="hero-actions">
+      <a class="cta" href="#pricing">See pricing</a>
+      <a class="cta ghost" href="#results">Read the test report</a>
+      <span class="cta-aside">MetaTrader 5 · one licence per account · Stripe or PayPal</span>
+    </div>
+
+    <figure class="regime-figure">
+      <svg viewBox="0 0 960 300" role="img" aria-label="A price series split into five stretches; each stretch is shaded by the hidden state the model assigns to it, with a bar underneath marking positive, flat and negative drift." xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .rl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;fill:var(--muted)}
+  </style>
+  <rect x="10.0" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.10"/><rect x="10.0" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="188.5" y="18" width="199.6" height="236" fill="var(--up)" opacity="0.10"/><rect x="188.5" y="260" width="197.6" height="10" rx="1" fill="var(--up)" opacity="0.85"/><rect x="388.1" y="18" width="168.0" height="236" fill="var(--down)" opacity="0.10"/><rect x="388.1" y="260" width="166.0" height="10" rx="1" fill="var(--down)" opacity="0.85"/><rect x="556.1" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.10"/><rect x="556.1" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="734.7" y="18" width="215.3" height="236" fill="var(--up)" opacity="0.10"/><rect x="734.7" y="260" width="213.3" height="10" rx="1" fill="var(--up)" opacity="0.85"/>
+  <path d="M10.0 234.4 L15.3 243.3 L20.5 240.6 L25.8 233.3 L31.0 237.0 L36.3 246.7 L41.5 247.2 L46.8 243.7 L52.0 235.7 L57.3 244.6 L62.5 254.0 L67.8 248.9 L73.0 245.4 L78.3 234.2 L83.5 227.1 L88.8 227.8 L94.0 229.8 L99.3 211.1 L104.5 213.2 L109.8 218.9 L115.0 227.2 L120.3 226.5 L125.5 225.4 L130.8 228.0 L136.0 228.4 L141.3 226.4 L146.5 221.4 L151.8 213.4 L157.0 211.8 L162.3 224.9 L167.5 219.8 L172.8 230.1 L178.0 231.4 L183.3 242.1 L188.5 238.6 L193.8 238.5 L199.1 234.0 L204.3 216.0 L209.6 212.7 L214.8 205.5 L220.1 207.8 L225.3 205.5 L230.6 199.1 L235.8 196.0 L241.1 190.8 L246.3 186.9 L251.6 187.7 L256.8 181.7 L262.1 181.8 L267.3 170.1 L272.6 168.8 L277.8 162.2 L283.1 158.7 L288.3 151.0 L293.6 150.1 L298.8 142.2 L304.1 139.2 L309.3 130.2 L314.6 123.9 L319.8 119.8 L325.1 119.7 L330.3 112.8 L335.6 107.2 L340.8 96.5 L346.1 94.7 L351.3 88.7 L356.6 83.0 L361.8 78.2 L367.1 73.8 L372.3 69.4 L377.6 68.5 L382.8 69.4 L388.1 78.3 L393.4 82.6 L398.6 82.6 L403.9 85.1 L409.1 87.3 L414.4 90.7 L419.6 94.5 L424.9 100.7 L430.1 104.1 L435.4 102.9 L440.6 111.5 L445.9 121.8 L451.1 119.7 L456.4 125.6 L461.6 128.1 L466.9 131.1 L472.1 143.4 L477.4 139.1 L482.6 137.9 L487.9 144.1 L493.1 147.6 L498.4 154.1 L503.6 165.3 L508.9 172.8 L514.1 178.1 L519.4 180.0 L524.6 183.7 L529.9 190.5 L535.1 191.2 L540.4 201.8 L545.6 205.2 L550.9 207.0 L556.1 209.2 L561.4 222.2 L566.6 228.8 L571.9 227.1 L577.2 223.2 L582.4 212.0 L587.7 219.3 L592.9 219.3 L598.2 214.5 L603.4 215.7 L608.7 233.0 L613.9 227.1 L619.2 210.2 L624.4 202.9 L629.7 209.6 L634.9 212.6 L640.2 211.0 L645.4 192.8 L650.7 188.3 L655.9 187.5 L661.2 176.2 L666.4 176.8 L671.7 163.2 L676.9 168.2 L682.2 171.7 L687.4 166.4 L692.7 156.0 L697.9 151.3 L703.2 149.1 L708.4 162.3 L713.7 167.5 L718.9 172.0 L724.2 175.9 L729.4 171.6 L734.7 169.5 L739.9 162.6 L745.2 158.7 L750.4 156.6 L755.7 152.6 L760.9 147.2 L766.2 139.9 L771.5 138.5 L776.7 136.0 L782.0 138.4 L787.2 127.9 L792.5 118.0 L797.7 115.2 L803.0 113.8 L808.2 115.7 L813.5 111.4 L818.7 107.0 L824.0 93.9 L829.2 89.3 L834.5 89.2 L839.7 96.4 L845.0 86.7 L850.2 82.3 L855.5 85.8 L860.7 81.5 L866.0 85.0 L871.2 66.3 L876.5 57.9 L881.7 51.9 L887.0 49.1 L892.2 54.9 L897.5 52.0 L902.7 55.2 L908.0 49.1 L913.2 54.9 L918.5 55.4 L923.7 46.5 L929.0 35.8 L934.2 37.4 L939.5 40.6 L944.7 33.3 L950.0 26.0" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="99" y="292" text-anchor="middle" class="rl">drift ~0</text><text x="288" y="292" text-anchor="middle" class="rl">drift +</text><text x="472" y="292" text-anchor="middle" class="rl">drift −</text><text x="645" y="292" text-anchor="middle" class="rl">drift ~0</text><text x="842" y="292" text-anchor="middle" class="rl">drift +</text>
+</svg>
+      <figcaption>
+        What the model produces: the same series cut into stretches, each one labelled with the
+        state the model believes generated it. Drift and volatility are estimated per state, so a
+        quiet range and a fast sell-off are never treated as the same market.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <p class="section-note">01 — how it works</p>
+    <h2>Two independent reasons to enter, and a switch that says which one is in charge</h2>
+
+    <div class="two-col">
+      <div>
+        <h3>The regime model</h3>
+        <p>
+          Each bar is reduced to two numbers: the log return over the last K bars and the bar
+          range relative to price. A Gaussian hidden Markov model with three states is fitted to
+          2,500 bars of that series using Baum–Welch, restarted six times from different random
+          seeds so a single unlucky start cannot decide the outcome.
+        </p>
+        <p>
+          The forward filter then gives the state probabilities at the current bar, the transition
+          matrix projects them one step ahead, and the expected move is the probability-weighted
+          drift over a horizon taken from each state's own persistence. A state the model expects
+          to last twenty bars gets a longer horizon than one it expects to last three.
+        </p>
+      </div>
+      <div>
+        <h3>The reversal module</h3>
+        <p>
+          A stochastic %K/%D crossover inside the oversold or overbought zone, confirmed by a bar
+          whose volume is at least 1.5× the recent average. Familiar, and deliberately so: it is
+          the kind of rule a discretionary trader already reads off the chart.
+        </p>
+        <p>
+          What is not familiar is that the robot measures it rather than assuming it. Every
+          retraining cycle it replays the rule across the available history, records the average
+          return six bars after each signal, long and short separately, and keeps the result.
+        </p>
+      </div>
+    </div>
+
+    <table class="states">
+      <thead>
+        <tr><th>Entry mode</th><th>What opens a position</th><th>Typical use</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="chip up"></span>HMM only</td>
+          <td>The regime model alone: probability above threshold and expected move above a
+              fraction of ATR.</td>
+          <td>Trend and continuation work on H4 and above.</td>
+        </tr>
+        <tr>
+          <td><span class="chip flat"></span>Reversal only</td>
+          <td>The stochastic and volume rule alone, provided its measured edge is positive.</td>
+          <td>Fast mean reversion on M30 and H1.</td>
+        </tr>
+        <tr>
+          <td><span class="chip up"></span>Reversal, HMM veto</td>
+          <td>The reversal fires, but the trade is dropped when the regime model points the other
+              way. This is the default.</td>
+          <td>The configuration used in the published test.</td>
+        </tr>
+        <tr>
+          <td><span class="chip down"></span>Either</td>
+          <td>Whichever fires first, each still subject to its own validation gate.</td>
+          <td>More trades, more exposure, more variance.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="validation">
+  <div class="wrap">
+    <p class="section-note">02 — the part that refuses to trade</p>
+    <h2>A model that fits beautifully and predicts nothing is still a failure</h2>
+    <p>
+      Any estimator will find structure in 2,500 bars. The question is whether that structure
+      survives contact with data the fitting never saw. RegimeSwitch Pro holds back the last
+      quarter of the training window, replays its own entry logic there, and measures the average
+      forward return of the signals it would have taken. The result is expressed in basis points
+      per bar and printed in the journal.
+    </p>
+
+<pre><span class="c">// Out-of-sample gate: replay the entry rule on held-back data</span>
+<span class="k">for</span>(<span class="k">int</span> t=startIdx; t&lt;T-1; t++)
+{
+   <span class="k">double</span> p,e; <span class="k">int</span> st;
+   SignalFromPost(m,post,p,e,st);              <span class="c">// same code as live</span>
+   <span class="k">double</span> thr = InpMinEdgeATR*atrRel;
+
+   <span class="k">if</span>     (p&gt;=InpMinProb     &amp;&amp; e&gt; thr) { sumL += ret1[t+1]; nL++; }
+   <span class="k">else if</span>(p&lt;=1.0-InpMinProb &amp;&amp; e&lt;-thr) { sumS += ret1[t+1]; nS++; }
+}
+
+m.valEdgeBp = ((sumL-sumS)/m.valSignals)*1e4;
+
+<span class="c">// No positive edge out of sample, no trading. No exceptions.</span>
+<span class="k">return</span> (m.valSignals&gt;=InpMinValSignals &amp;&amp; m.valEdgeBp&gt;InpMinValEdgeBp);</pre>
+    <p class="code-caption">
+      From the shipped source. When this returns false the context is marked not tradable and is
+      skipped until the next retraining cycle produces something better.
+    </p>
+
+    <p>
+      The reversal module is held to the same standard, and because it is a fixed rule rather than
+      a fitted model, the measurement is direct: count the signals, look six bars forward, average.
+      Fewer than twenty signals in the window, or a negative edge, and that symbol and timeframe
+      stops taking reversal entries.
+    </p>
+
+<pre><span class="c">// The reversal rule, evaluated only on closed bars</span>
+<span class="k">bool</span> volOK = (v[t] &gt; InpVolFactor*volAvg);      <span class="c">// 1.5x the 10-bar mean</span>
+<span class="k">if</span>(!volOK) <span class="k">return</span> 0;
+
+<span class="k">bool</span> crossUp   = (k[t-1]&lt;=d[t-1] &amp;&amp; k[t]&gt;d[t]);
+<span class="k">bool</span> crossDown = (k[t-1]&gt;=d[t-1] &amp;&amp; k[t]&lt;d[t]);
+
+<span class="k">if</span>(crossUp   &amp;&amp; MathMin(k[t],k[t-1])&lt;=InpOversold)   <span class="k">return</span> +1;
+<span class="k">if</span>(crossDown &amp;&amp; MathMax(k[t],k[t-1])&gt;=InpOverbought) <span class="k">return</span> -1;
+<span class="k">return</span> 0;</pre>
+    <p class="code-caption">
+      Every rule in the product is this legible. You can read what opens a position, and you can
+      read what closes it.
+    </p>
+
+    <div class="cols-3">
+      <div>
+        <h3>Retrains as it runs</h3>
+        <p>
+          Every 250 bars each context refits and revalidates, one at a time so the terminal never
+          freezes. Models are written to disk and reloaded on restart.
+        </p>
+      </div>
+      <div>
+        <h3>Reports what it is thinking</h3>
+        <p>
+          An hourly journal table lists every symbol and timeframe with its state, probability,
+          measured edge, signal count and the reason it did or did not trade.
+        </p>
+      </div>
+      <div>
+        <h3>Never averages down</h3>
+        <p>
+          One position per symbol by default, an ATR stop on every entry, no grid, no martingale,
+          no recovery mode. Losses are taken at the stop.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scope">
+  <div class="wrap">
+    <p class="section-note">03 — one chart, many markets</p>
+    <h2>Twenty-eight pairs and ten timeframes from a single window</h2>
+    <p>
+      Attach it once. Each symbol carries its own list of timeframes, and each symbol-timeframe
+      pair becomes an independent context with its own indicator handles, its own trained model and
+      its own magic number. Up to eighty contexts on one chart, and they do not interfere with each
+      other or with anything else running on your account.
+    </p>
+
+<pre><span class="c">// The whole universe, in one input string</span>
+InpPreset     = PRESET_MAJORS;
+InpSymbolSpec = <span class="s">"EURUSD:H1,H4; GBPUSD:H4; USDJPY:M30; USDCHF:H4; USDCAD:H4;"</span>;
+InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m", "_raw" — matches your broker</span></pre>
+    <p class="code-caption">
+      Presets cover the seven majors, the twenty-one crosses, or all twenty-eight. The spec string
+      overrides or extends them per symbol.
+    </p>
+
+    <table class="states">
+      <thead>
+        <tr><th>Control</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Risk per trade</td><td>Position size computed from equity, the ATR stop distance and the tick value of the instrument. Fixed lot available.</td></tr>
+        <tr><td>Stop and target</td><td>ATR multiples, with an optional ATR trailing stop that follows the position once it moves your way.</td></tr>
+        <tr><td>Exposure caps</td><td>A hard ceiling on open positions in total and per symbol, so a correlated cluster cannot open at once.</td></tr>
+        <tr><td>Spread guard</td><td>Entries are skipped when the spread is above your limit, which matters at rollover and on news.</td></tr>
+        <tr><td>Exits</td><td>Stop, target, trailing stop, opposite reversal signal, or a flip in the model's direction — each switchable.</td></tr>
+        <tr><td>On-chart panel</td><td>A live summary of the busiest contexts: state, probability, edge and open positions.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <p class="section-note">04 — test results</p>
+    <h2>The numbers, and everything wrong with them</h2>
+    <p>
+      One Strategy Tester run, five symbols, 100% real ticks from a live Vantage Markets server,
+      1 January 2025 to 2 August 2026. Default settings: reversal with regime veto, 1% risk per
+      trade, 2×ATR stop, 3×ATR target, trailing on, ten positions maximum.
+    </p>
+
+    <div class="figures">
+      <div><b>1.27</b><span>Profit factor</span></div>
+      <div><b>376</b><span>Trades</span></div>
+      <div><b>6.65%</b><span>Maximum balance drawdown</span></div>
+      <div><b>58.2%</b><span>Winning trades</span></div>
+    </div>
+
+    <div class="shots">
+      <figure>
+        <img src="report/balance.png" alt="Balance curve rising over the test period with several flat stretches and pullbacks.">
+        <figcaption>Balance over 376 trades. The flat stretches are contexts sitting out after failing validation.</figcaption>
+      </figure>
+      <figure>
+        <img src="report/mfe-mae.png" alt="Scatter of trade profit against maximum favourable and adverse excursion.">
+        <figcaption>Profit against maximum favourable and adverse excursion. The band of losses near −110 is the ATR stop doing its job.</figcaption>
+      </figure>
+    </div>
+
+    <div class="caveat">
+      <h3>Read this before you read the report</h3>
+      <p>
+        The run was made in the tester's pip-based profit mode. That means commission and swap are
+        not included, so no cash return or percentage gain is quoted anywhere on this page, and you
+        should not infer one. What the run does support is the shape of the thing: the win rate,
+        the ratio of average win to average loss, the trade count and the drawdown relative to the
+        stop size.
+      </p>
+      <p>
+        It is also a single window on a single broker's data. Nineteen months and 376 trades is
+        enough to be interesting and nowhere near enough to be conclusive. The model trains on
+        whatever history your own terminal holds, so your results will differ from this run by
+        construction.
+      </p>
+      <p>
+        Run it on a demo account with your broker's spreads and commissions before you risk money.
+        That is not a disclaimer, it is the correct next step.
+      </p>
+    </div>
+
+    <p class="buy-note">
+      <a href="report/ReportTester-EURUSD.html">Open the full Strategy Tester report</a> — every
+      trade, every input, unedited.
+    </p>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <p class="section-note">05 — pricing</p>
+    <h2>Rent it monthly, or buy it once</h2>
+    <p>
+      Both options include the compiled expert advisor, the full input reference, the default
+      configuration used in the published test, and email support from the person who wrote it.
+    </p>
+
+    <div class="plans">
+      <div class="plan">
+        <h3>Monthly</h3>
+        <p class="price">€39<small> / month</small></p>
+        <p class="was">Cancel any time, from your own Stripe or PayPal receipt.</p>
+        <ul>
+          <li>One MetaTrader 5 account</li>
+          <li>All updates while active</li>
+          <li>Email support</li>
+          <li>Free account transfer</li>
+        </ul>
+        <div class="buy-row">
+          <a class="cta" href="PASTE_STRIPE_SUBSCRIPTION">Subscribe with card</a>
+          <a class="paypal" href="PASTE_PAYPAL_SUBSCRIPTION">Subscribe with PayPal</a>
+        </div>
+      </div>
+
+      <div class="plan featured">
+        <h3>Lifetime licence</h3>
+        <p class="price">€249<small> once</small></p>
+        <p class="was">Launch price. Going to €329 after the first ten licences.</p>
+        <ul>
+          <li>One MetaTrader 5 account, no expiry</li>
+          <li>All version 2.x updates included</li>
+          <li>Priority email support</li>
+          <li>Free account transfer</li>
+        </ul>
+        <div class="buy-row">
+          <a class="cta" href="PASTE_STRIPE_LICENCE">Buy with card</a>
+          <a class="paypal" href="PASTE_PAYPAL_LICENCE">Buy with PayPal</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="buy-note">
+      Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for.
+      Changing broker or account is free — write in and the key is reissued. Software is delivered
+      by email, normally within a few hours and always within one working day.
+    </p>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <p class="section-note">06 — getting started</p>
+    <h2>From payment to first signal</h2>
+    <ol class="steps">
+      <li>
+        <b>Pay and send your account number</b>
+        <p>Stripe asks for it at checkout. If you pay with PayPal, the confirmation page collects
+           it instead. It is the login number of the MT5 account you want to run, demo or live.</p>
+      </li>
+      <li>
+        <b>Drop the file into MQL5/Experts and restart</b>
+        <p>The compiled .ex5 goes in the Experts folder of your terminal's data directory. Refresh
+           the Navigator and it appears.</p>
+      </li>
+      <li>
+        <b>Paste the key and pick your universe</b>
+        <p>One key field, one symbol spec string. Start with the default: majors, reversal with
+           regime veto, 1% risk.</p>
+      </li>
+      <li>
+        <b>Let it warm up</b>
+        <p>Each context trains once before it can trade, one at a time so the terminal stays
+           responsive. On a full universe allow a few minutes. The journal table tells you exactly
+           where it is.</p>
+      </li>
+      <li>
+        <b>Watch the journal before you go live</b>
+        <p>The hourly table shows which contexts passed validation and which are sitting out. If
+           most of your universe is sitting out, that is information, not a fault.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="faq" class="faq">
+  <div class="wrap">
+    <p class="section-note">07 — questions</p>
+    <h2>Things worth asking before you buy</h2>
+
+    <details>
+      <summary>Do I need to know what a hidden Markov model is?</summary>
+      <p>No. You need to know that the robot estimates which of three market states it is in, that
+         it will not trade a symbol whose model failed its own test, and that you set the risk. The
+         mathematics is documented for people who want it and ignorable for people who do not.</p>
+    </details>
+
+    <details>
+      <summary>Will it work on my broker?</summary>
+      <p>It works on any MetaTrader 5 broker with hedging or netting, and handles symbol suffixes
+         like <code>.ecn</code> or <code>_raw</code> through one input. Spread and commission decide
+         whether it is profitable for you, which is why the demo run comes first.</p>
+    </details>
+
+    <details>
+      <summary>How much history does it need?</summary>
+      <p>2,500 bars per context by default, plus the validation slice. On H4 that is roughly two
+         years. Scroll the chart back in the terminal once so the history downloads, and the models
+         train themselves from there.</p>
+    </details>
+
+    <details>
+      <summary>Can I run it on a VPS?</summary>
+      <p>Yes, and you should if you want it running overnight. Training is spread across bars
+         rather than done in one blocking pass, so a modest VPS handles a full universe.</p>
+    </details>
+
+    <details>
+      <summary>What happens when the market changes?</summary>
+      <p>Every 250 bars each context refits on the most recent window and revalidates. A setup that
+         worked last quarter and stopped working drops out of the tradable set on its own. That is
+         the entire point of the design.</p>
+    </details>
+
+    <details>
+      <summary>Is there a refund?</summary>
+      <p>Licence keys cannot be recalled once issued, so purchases are final. That is exactly why
+         the test report is published unedited, the rules are documented, and you are told to run a
+         demo first. If something does not work as described, write in and it gets fixed.</p>
+    </details>
+
+    <details>
+      <summary>Will you sell me a copy without the licence check?</summary>
+      <p>No.</p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="risk">
+      Trading foreign exchange and CFDs on margin carries a high level of risk and can result in the
+      loss of all of your capital. Backtested and simulated results do not represent actual trading
+      and have inherent limitations, including the benefit of hindsight. Past performance does not
+      indicate future results. RegimeSwitch Pro is trading software, not investment advice, and no
+      outcome is promised or implied. Only trade with money you can afford to lose.
+    </p>
+    <div class="footer-line">
+      <span>© 2026 Wisfli · <a href="terms.html">Terms and licence</a> · <a href="activate.html">Activate a purchase</a></span>
+      <span><a href="mailto:you@yourdomain.com">you@yourdomain.com</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

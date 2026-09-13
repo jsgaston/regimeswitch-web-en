@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activate RegimeSwitch Pro</title>
+<meta name="description" content="Send your MetaTrader 5 account number and receive your RegimeSwitch Pro licence key.">
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="index.html">Wisfli<span> / RegimeSwitch Pro</span></a>
+    <nav><a href="index.html">Back to the product</a></nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Payment received. One thing left.</h1>
+    <p class="lede">
+      Your licence key is generated from your MetaTrader 5 account number, so I need that number
+      before I can issue it. If Stripe already asked you for it at checkout, it is on its way and
+      you can close this page.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="section-note">where to find the number</p>
+    <h2>Your MT5 account number</h2>
+    <p>
+      Open MetaTrader 5 and look at the Navigator panel, under Accounts. The number next to your
+      broker's name is the login — usually seven to nine digits. It is also the number at the top
+      of the terminal window and in your broker's welcome email. It is not your password and not
+      your investor password, and you should never send either of those to anyone, including me.
+    </p>
+
+    <ol class="steps">
+      <li>
+        <b>Copy your account number</b>
+        <p>Demo or live, both work. If you want to test on demo first, send the demo number now and
+           the live one later — transfers are free.</p>
+      </li>
+      <li>
+        <b>Email it with your payment receipt</b>
+        <p>Send both to <a href="mailto:you@yourdomain.com">you@yourdomain.com</a>. The receipt is
+           whatever Stripe or PayPal sent you; forwarding it is enough.</p>
+      </li>
+      <li>
+        <b>Wait for the key</b>
+        <p>You will get the compiled expert advisor, your key and a one-page setup note. Normally
+           within a few hours, always within one working day.</p>
+      </li>
+    </ol>
+
+    <div class="field" style="margin-top:38px">
+      <label for="acct">Your account number, ready to copy into the email</label>
+      <input id="acct" type="text" inputmode="numeric" placeholder="e.g. 27085970" autocomplete="off">
+      <small>Nothing is sent from this page. The box is here so you can check the number looks
+             right before you paste it.</small>
+    </div>
+
+    <p style="margin-top:30px">
+      <a class="cta" href="mailto:you@yourdomain.com?subject=RegimeSwitch%20Pro%20activation&amp;body=My%20MT5%20account%20number%3A%20%0A%0A(payment%20receipt%20attached%20or%20forwarded)">Open an email with the subject filled in</a>
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="section-note">while you wait</p>
+    <h2>Two things worth doing now</h2>
+    <div class="two-col">
+      <div>
+        <h3>Download the history</h3>
+        <p>
+          The model trains on the bars your terminal holds. Open a chart for each symbol you plan
+          to run, set the timeframe you want, and scroll back a few years so MetaTrader pulls the
+          history down. Do this once and the warm-up is quick.
+        </p>
+      </div>
+      <div>
+        <h3>Allow algorithmic trading</h3>
+        <p>
+          Tools → Options → Expert Advisors, tick "Allow algorithmic trading". The toolbar button
+          has to be green as well, otherwise the robot reads the market and never places an order.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="risk">
+      Trading foreign exchange and CFDs on margin carries a high level of risk and can result in the
+      loss of all of your capital. Past performance does not indicate future results. Only trade with
+      money you can afford to lose.
+    </p>
+    <div class="footer-line">
+      <span>© 2026 Wisfli · <a href="terms.html">Terms and licence</a></span>
+      <span><a href="mailto:you@yourdomain.com">you@yourdomain.com</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
