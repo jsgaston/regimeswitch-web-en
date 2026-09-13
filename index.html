@@ -355,8 +355,27 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
           <li>Free account transfer</li>
         </ul>
         <div class="buy-row">
-          <a class="cta" href="PASTE_STRIPE_SUBSCRIPTION">Subscribe with card</a>
-          <a class="paypal" href="PASTE_PAYPAL_SUBSCRIPTION">Subscribe with PayPal</a>
+          <div id="paypal-button-container-P-2EA83729XE4434916NKTILZI"></div>
+<script src="https://www.paypal.com/sdk/js?client-id=AWa_6Af93UGQdocFcdOmDgC6xGjFV4Kp-8yeFyZ6DhHqPDnHt6kK5xQdSenwitI1-a0kk4Sc4DeCYK9N&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+  paypal.Buttons({
+      style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          /* Creates the subscription */
+          plan_id: 'P-2EA83729XE4434916NKTILZI'
+        });
+      },
+      onApprove: function(data, actions) {
+        alert(data.subscriptionID); // You can add optional success message for the subscriber here
+      }
+  }).render('#paypal-button-container-P-2EA83729XE4434916NKTILZI'); // Renders the PayPal button
+</script>
         </div>
       </div>
 
