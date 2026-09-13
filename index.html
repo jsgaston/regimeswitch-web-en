@@ -390,8 +390,15 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
           <li>Free account transfer</li>
         </ul>
         <div class="buy-row">
-          <a class="cta" href="PASTE_STRIPE_LICENCE">Buy with card</a>
-          <a class="paypal" href="PASTE_PAYPAL_LICENCE">Buy with PayPal</a>
+          <script async
+  src="https://js.stripe.com/v3/buy-button.js">
+</script>
+
+<stripe-buy-button
+  buy-button-id="buy_btn_1UFBRf9abIQixlisOyLEXGhu"
+  publishable-key="pk_live_51TZyif9abIQixliscbpfVG3y2wD28GUvAfE7BnvbENBMOyUQMqE4Dh954G2zII0HNpZ6dTZxUJg4kpncQrUL266Z00nJ9nMGOT"
+>
+</stripe-buy-button>
         </div>
       </div>
     </div>
