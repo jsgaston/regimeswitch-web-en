@@ -5,175 +5,395 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RegimeSwitch Pro — a self-training regime model for MetaTrader 5</title>
 <meta name="description" content="An MT5 expert advisor that trains a hidden Markov model on your own chart data, refuses to trade contexts that fail out-of-sample validation, and runs many symbols and timeframes from a single chart.">
-
+<meta name="theme-color" content="#06141F">
 <meta property="og:title" content="RegimeSwitch Pro — a self-training regime model for MetaTrader 5">
 <meta property="og:description" content="It learns what kind of market it is in before it decides whether to trade. Rules documented, limits stated, licence tied to one account.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wisfli.com/regimeswitch/">
-
-<!--
-  ═══════════════════════════════════════════════════════════════════
-   BEFORE PUBLISHING — search for "PASTE_" and for "you@yourdomain.com"
-  ═══════════════════════════════════════════════════════════════════
-   1. PASTE_STRIPE_SUBSCRIPTION  → Stripe Payment Link, monthly plan
-   2. PASTE_STRIPE_LICENCE       → Stripe Payment Link, one-off licence
-   3. PASTE_PAYPAL_SUBSCRIPTION  → PayPal subscription button link
-   4. PASTE_PAYPAL_LICENCE       → PayPal "Buy Now" button link
-   5. you@yourdomain.com         → your support address (3 places)
-   6. Footer: trading name and NIF (required when selling from Spain)
-   7. report/ReportTester-EURUSD.html → the Strategy Tester report
-
-   IN STRIPE: on each Payment Link add a REQUIRED custom field called
-   "MT5 account number". Without it you cannot issue the key. Set the
-   post-payment redirect to .../activate.html
-
-   IN PAYPAL: paypal.com/buttons → copy the hosted button link. PayPal
-   does not collect the account number, which is why activate.html asks
-   for it.
-  ═══════════════════════════════════════════════════════════════════
--->
-
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306141F'/><rect x='4' y='6' width='8' height='20' fill='%2345C29A' opacity='.6'/><rect x='12' y='6' width='8' height='20' fill='%23E8715F' opacity='.6'/><rect x='20' y='6' width='8' height='20' fill='%238DA4B4' opacity='.6'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#06141F; --abyss-2:#0A2130; --sea:#0F2C42; --chart:#E4EAE8; --panel:#F7F9F8;
+  --ink:#0F2C42; --ink-2:#34506A; --muted:#607487;
+  --rule:rgba(15,44,66,.14); --rule-2:rgba(15,44,66,.3);
+  --drule:rgba(214,230,240,.13); --drule-2:rgba(214,230,240,.26);
+  --dtext:#DCE6EC; --dmuted:#8DA4B4;
+  --brass:#E0A92C; --brass-2:#F0BD48;
+  --up:#1E6B57; --down:#BE3A2B; --sig:#45C29A; --sig-down:#E8715F;
+  --maxw:1200px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:74px}
+body{margin:0;background:var(--chart);color:var(--ink);font:400 17.5px/1.68 Spectral,Georgia,serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,nav,button,summary,table,.ui{font-family:Archivo,system-ui,sans-serif}
+a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+.skip{position:absolute;left:-999px;top:0;background:var(--brass);color:#1A1206;padding:8px 14px;font-family:Archivo;z-index:99}
+.skip:focus{left:12px;top:12px}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.9em}
+
+/* nav */
+.top{position:sticky;top:0;z-index:50;background:rgba(6,20,31,.92);backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--drule)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:20px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#fff;font:700 16px Archivo;font-stretch:122%;letter-spacing:.09em;white-space:nowrap}
+.brand svg{width:27px;height:18px;display:block}
+.brand .prod{font-stretch:100%;letter-spacing:0;font-weight:500;color:var(--dmuted)}
+.top nav{display:flex;align-items:center;gap:24px;font-size:14.5px}
+.top nav a{text-decoration:none;color:var(--dmuted);font-weight:500;white-space:nowrap}
+.top nav a:hover{color:#fff}
+.top nav a.pill{color:#1A1206;background:var(--brass);padding:8px 18px;font-weight:700}
+.top nav a.pill:hover{background:var(--brass-2)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;font:700 16px Archivo;text-decoration:none;padding:15px 26px;border:1px solid transparent;cursor:pointer;transition:background .15s,border-color .15s}
+.btn.brass{background:var(--brass);color:#1A1206}
+.btn.brass:hover{background:var(--brass-2)}
+.btn.line{color:#fff;border-color:var(--drule-2)}
+.btn.line:hover{border-color:#fff}
+.btn.ink{background:var(--sea);color:#EEF3F1}
+.btn.ink:hover{background:#17405E}
+.btn.ghost{color:var(--ink);border-color:var(--rule-2)}
+.btn.ghost:hover{border-color:var(--ink)}
+.actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.aside{font:500 13.5px Archivo;color:var(--dmuted)}
+
+/* hero */
+.hero{position:relative;background:var(--abyss);color:var(--dtext);overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.55;
+  background-image:linear-gradient(var(--drule) 1px,transparent 1px),linear-gradient(90deg,var(--drule) 1px,transparent 1px);
+  background-size:64px 64px;background-position:-1px -1px;
+  mask-image:radial-gradient(ellipse 90% 80% at 70% 40%,#000 25%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 80% at 70% 40%,#000 25%,transparent 75%)}
+.hero > .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;padding-top:92px;padding-bottom:100px}
+.where{font:500 14px Archivo;color:var(--dmuted);margin:0 0 26px;display:flex;align-items:center;gap:10px}
+.where i{display:block;width:26px;height:1px;background:var(--brass);flex:none}
+.hero h1{margin:0 0 28px;color:#fff;font-weight:800;font-stretch:110%;font-size:clamp(42px,5.6vw,80px);line-height:.98;letter-spacing:-.025em}
+.hero h1.long{font-size:clamp(34px,4.1vw,56px);line-height:1.04}
+.lede{font-size:20.5px;line-height:1.55;color:#BCCDD8;max-width:31em;margin:0 0 20px;font-weight:300}
+.lede + .actions,.lede:last-of-type{margin-bottom:38px}
+
+.instrument{background:linear-gradient(180deg,rgba(15,44,66,.72),rgba(10,33,48,.9));border:1px solid var(--drule-2);box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.instrument header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--drule)}
+.instrument header b{font:700 15px Archivo;color:#fff;font-stretch:112%;letter-spacing:.02em}
+.instrument header span{font:500 12.5px Archivo;color:var(--dmuted)}
+.badge{font:700 11px Archivo;letter-spacing:.04em;color:#1A1206;background:var(--brass);padding:2px 7px;margin-left:8px;vertical-align:2px}
+.inst-big{padding:22px 20px 0;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.inst-big .num{font:800 54px/1 Archivo;font-stretch:108%;color:#fff;letter-spacing:-.02em}
+.inst-big .lab{font:500 13.5px Archivo;color:var(--dmuted)}
+.inst-chart{height:180px;padding:10px 0 0}
+.inst-chart svg{display:block;width:100%;height:100%}
+.inst-fig{padding:18px 20px 6px}
+.inst-fig svg{display:block;width:100%;height:auto}
+.inst-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--drule);margin:0}
+.inst-grid div{padding:14px 16px 16px;border-right:1px solid var(--drule)}
+.inst-grid div:last-child{border-right:0}
+.inst-grid dt{font:500 12px Archivo;color:var(--dmuted);margin:0 0 3px}
+.inst-grid dd{font:700 20px Archivo;color:#fff;margin:0;white-space:nowrap}
+.inst-foot{padding:12px 20px;border-top:1px solid var(--drule);font:400 12.5px/1.5 Archivo;color:var(--dmuted);margin:0}
+.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.8s .25s cubic-bezier(.6,.05,.25,1) forwards}
+.fade{opacity:0;animation:fadein .8s 1.5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+
+/* principles strip */
+.principles{background:var(--abyss-2);color:var(--dtext);border-top:1px solid var(--drule)}
+.principles .wrap{display:grid;grid-template-columns:repeat(3,1fr)}
+.principles div{padding:34px 34px 36px 0;margin-right:34px;border-right:1px solid var(--drule)}
+.principles div:last-child{border-right:0;margin-right:0}
+.principles h3{margin:0 0 6px;font-size:18px;font-weight:700;color:#fff;font-stretch:106%}
+.principles p{margin:0;font-size:15.5px;color:var(--dmuted);line-height:1.6}
+
+/* sections */
+section{padding:108px 0}
+section.panel{background:var(--panel);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+section.dark{background:var(--abyss);color:var(--dtext)}
+.head{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:54px}
+.head.solo{grid-template-columns:1fr;max-width:52em}
+h2{margin:0;font-size:clamp(34px,4.3vw,58px);line-height:1.02;font-weight:800;font-stretch:108%;letter-spacing:-.02em}
+.head p{margin:0;color:var(--ink-2);font-size:18px;max-width:36em}
+.dark h2,.dark h3{color:#fff}
+.dark .head p,.dark p{color:#B4C6D2}
+h3{font-size:20px;line-height:1.25;margin:0 0 8px;font-weight:700}
+.prose p{max-width:40em;margin:0 0 18px}
+.prose p:last-child{margin-bottom:0}
+.dark a{color:#fff}
+
+/* features */
+.feat-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+.art{margin:0;background:var(--sea);border:1px solid var(--rule);position:sticky;top:96px}
+.art svg{display:block;width:100%;height:auto}
+.art figcaption{padding:12px 18px;font:500 13px Archivo;color:var(--dmuted);border-top:1px solid var(--drule);background:var(--abyss-2)}
+.feats > div{padding:26px 0;border-top:1px solid var(--rule-2)}
+.feats > div:last-child{border-bottom:1px solid var(--rule-2)}
+.feats p{margin:0;color:var(--ink-2);font-size:16.5px}
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.cols-3{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:56px;border-top:1px solid var(--rule-2)}
+.cols-3 > div{padding:26px 28px 0 0;margin-right:28px;border-right:1px solid var(--rule)}
+.cols-3 > div:last-child{border-right:0;margin-right:0}
+.cols-3 p{margin:0;font-size:16px;color:var(--ink-2)}
+.dark .cols-3{border-color:var(--drule-2)}
+.dark .cols-3 > div{border-color:var(--drule)}
+.dark .cols-3 p{color:var(--dmuted)}
+
+/* data boards */
+.board{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--drule-2);background:rgba(15,44,66,.35);margin:0 0 40px}
+.board div{padding:22px 22px 24px;border-right:1px solid var(--drule)}
+.board div:last-child{border-right:0}
+.board b{display:block;font:800 40px/1 Archivo;color:#fff;font-stretch:106%;letter-spacing:-.02em}
+.board span{display:block;font:500 13px Archivo;color:var(--dmuted);margin-top:8px}
+section:not(.dark) .board{background:var(--abyss)}
+
+table.data{width:100%;border-collapse:collapse;font-size:15.5px}
+table.data caption{text-align:left;font:700 15px Archivo;padding:0 0 12px;color:inherit}
+table.data th,table.data td{text-align:left;padding:13px 16px 13px 0;border-top:1px solid var(--rule);vertical-align:top}
+table.data thead th{font-size:13px;font-weight:600;color:var(--muted);border-top:0;border-bottom:1px solid var(--rule-2);padding-bottom:10px}
+table.data tbody tr:last-child td,table.data tbody tr:last-child th{border-bottom:1px solid var(--rule)}
+table.data td.v{text-align:right;font-weight:700;white-space:nowrap;padding-right:0}
+table.data tbody th{font-weight:500;color:var(--muted);width:38%}
+.dark table.data th,.dark table.data td{border-color:var(--drule)}
+.dark table.data thead th{color:var(--dmuted);border-color:var(--drule-2)}
+.dark table.data td{color:var(--dtext)}
+.dark table.data td.v{color:#fff}
+.dark table.data caption{color:#fff}
+.table-scroll{overflow-x:auto}
+
+.spec{display:grid;grid-template-columns:1fr 1fr;column-gap:56px;border-top:1px solid var(--rule-2)}
+.spec div{display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-bottom:1px solid var(--rule)}
+.spec dt{color:var(--muted);font:500 15px Archivo}
+.spec dd{margin:0;font:600 15px Archivo;text-align:right}
+
+.caveat{border-left:3px solid var(--brass);background:rgba(224,169,44,.08);padding:26px 30px;margin:40px 0 0;max-width:62em}
+.caveat h3{margin-top:0}
+.caveat p{margin:0 0 14px;font-size:16.5px}
+.caveat p:last-child{margin-bottom:0}
+.dark .caveat{background:rgba(224,169,44,.07)}
+.dark .caveat p{color:#C9D8E1}
+
+pre{background:var(--abyss);color:#DCE6EC;border:1px solid var(--drule-2);padding:22px 24px;overflow-x:auto;font:400 14px/1.65 "IBM Plex Mono",ui-monospace,monospace;margin:28px 0 10px}
+.dark pre{background:#030C13}
+pre .c{color:#6F8797} pre .k{color:#F0BD48} pre .s{color:#45C29A}
+.code-caption{font:400 13.5px/1.55 Archivo;color:var(--muted);margin:0 0 30px;max-width:56em}
+.dark .code-caption{color:var(--dmuted)}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
+.plan{background:var(--panel);border:1px solid var(--rule);padding:38px 36px 34px;display:flex;flex-direction:column;position:relative}
+.plan h3{font-size:22px;margin:0 0 6px}
+.plan .who{margin:0 0 22px;color:var(--ink-2);font-size:16px}
+.plan .price{font:800 58px/1 Archivo;font-stretch:106%;letter-spacing:-.02em;margin:0 0 8px}
+.plan .price small,.plan .price em{font:500 16px Archivo;color:var(--muted);font-style:normal;letter-spacing:0}
+.plan .was{font:500 13.5px Archivo;color:var(--muted);margin:0 0 24px}
+.plan ul{list-style:none;margin:0 0 28px;padding:0;font:15.5px/1.5 Archivo}
+.plan li{padding:9px 0 9px 26px;border-top:1px solid var(--rule);position:relative}
+.plan li::before{content:"";position:absolute;left:2px;top:17px;width:10px;height:5px;border-left:2px solid var(--up);border-bottom:2px solid var(--up);transform:rotate(-45deg)}
+.plan .pay-slot{margin-top:auto;min-height:56px}
+.plan.pick{background:var(--abyss);color:var(--dtext);border-color:var(--abyss)}
+.plan.pick h3,.plan.pick .price{color:#fff}
+.plan.pick .who{color:#B4C6D2}
+.plan.pick .price small,.plan.pick .price em,.plan.pick .was{color:var(--dmuted)}
+.plan.pick li{border-color:var(--drule)}
+.plan.pick li::before{border-color:var(--sig)}
+.plan .tag{position:absolute;top:-1px;right:28px;transform:translateY(-50%);background:var(--brass);color:#1A1206;font:700 12.5px Archivo;padding:5px 12px}
+.hint{font:400 14.5px/1.6 Archivo;color:var(--muted);margin:26px 0 0;max-width:60em}
+
+/* steps: real sequences only */
+ol.steps{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:0 56px}
+ol.steps li{counter-increment:st;position:relative;padding:26px 0 26px 64px;border-top:1px solid var(--rule-2)}
+ol.steps li::before{content:counter(st);position:absolute;left:0;top:22px;font:800 38px/1 Archivo;font-stretch:108%;color:var(--brass)}
+ol.steps li b,ol.steps li strong:first-child{display:block;font:700 18px/1.3 Archivo;margin:0 0 6px}
+ol.steps li p{margin:0;color:var(--ink-2);font-size:16px}
+ol.steps li{font-size:16px;color:var(--ink-2)}
+
+/* faq */
+.faq-list{border-top:1px solid var(--rule-2);max-width:880px}
+details{border-bottom:1px solid var(--rule-2)}
+summary{list-style:none;cursor:pointer;padding:22px 48px 22px 0;font:600 18.5px/1.35 Archivo;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";position:absolute;right:8px;top:50%;width:14px;height:14px;margin-top:-7px;
+  background:linear-gradient(currentColor,currentColor) center/14px 2px no-repeat,linear-gradient(currentColor,currentColor) center/2px 14px no-repeat;transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+summary:hover{color:var(--up)}
+details p{margin:0 0 24px;max-width:46em;color:var(--ink-2)}
+details code{background:rgba(15,44,66,.07);padding:1px 5px}
+
+/* contact strip */
+.contact{background:var(--brass);color:#1A1206;padding:72px 0}
+.contact .wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.contact h2{font-size:clamp(30px,3.6vw,46px)}
+.contact p{margin:0;font-size:18px}
+.contact a.mail{font:700 20px Archivo;word-break:break-word}
+
+/* footer */
+footer{background:var(--abyss);color:var(--dmuted);font:14px/1.6 Archivo;padding:72px 0 56px}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px;padding-bottom:44px;border-bottom:1px solid var(--drule)}
+footer h4{margin:0 0 14px;color:#fff;font-size:14px;font-weight:600}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin:0 0 8px}
+footer a{text-decoration:none;color:var(--dtext)}
+footer a:hover{color:#fff;text-decoration:underline}
+footer .brand{margin-bottom:16px}
+footer .legal{padding-top:28px;font-size:12.5px;color:#6F8797}
+footer .legal p{margin:0 0 10px;max-width:74em}
+footer .legal strong{color:var(--dmuted)}
+
+@media (max-width:1040px){
+  .hero > .wrap{grid-template-columns:1fr;gap:56px;padding-top:70px;padding-bottom:80px}
+  .feat-grid{grid-template-columns:1fr;gap:36px}
+  .art{position:static}
+  .top nav a.opt{display:none}
+}
+@media (max-width:760px){
+  body{font-size:16.5px}
+  .wrap{padding:0 20px}
+  .top nav a:not(.pill){display:none}
+  .brand .prod{display:none}
+  section{padding:72px 0}
+  .head{grid-template-columns:1fr;gap:16px;margin-bottom:36px}
+  .principles .wrap,.cols-2,.cols-3,.plans,.spec,ol.steps,.contact .wrap,footer .cols{grid-template-columns:1fr}
+  .principles div{border-right:0;margin-right:0;padding:24px 0;border-bottom:1px solid var(--drule)}
+  .principles div:last-child{border-bottom:0}
+  .cols-3 > div{border-right:0;margin-right:0;padding:22px 0;border-bottom:1px solid var(--rule)}
+  .cols-2{gap:28px}
+  .inst-grid,.board{grid-template-columns:repeat(2,1fr)}
+  .inst-grid div:nth-child(2),.board div:nth-child(2){border-right:0}
+  .inst-grid div:nth-child(-n+2),.board div:nth-child(-n+2){border-bottom:1px solid var(--drule)}
+  .inst-big .num{font-size:44px}
+  .board b{font-size:32px}
+  .plan{padding:30px 24px}
+  .plan .price{font-size:48px}
+  ol.steps li{padding-left:52px}
+  .contact{padding:56px 0}
+  .contact .wrap{gap:18px}
+  footer .cols{gap:32px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  .draw{stroke-dashoffset:0}.fade{opacity:1}
+}
+
+/* page-specific */
+.mode{display:inline-block;width:10px;height:10px;margin-right:10px;vertical-align:0}
+.mode.up{background:var(--sig)} .mode.flat{background:#8DA4B4} .mode.down{background:var(--sig-down)}
+.default{font:600 11.5px Archivo;color:#1A1206;background:var(--brass);padding:1px 6px;margin-left:6px;vertical-align:2px}
+.code-grid pre{margin-top:22px}
+.shots figure{margin:0;background:var(--abyss-2);border:1px solid var(--drule-2)}
+.shots img{width:100%;background:#fff}
+.shots figcaption{padding:14px 18px;font:400 13.5px/1.55 Archivo;color:var(--dmuted)}
+</style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<header class="masthead">
+<header class="top">
   <div class="wrap">
-    <a class="wordmark" href="https://wisfli.com/">Wisfli<span> / RegimeSwitch Pro</span></a>
-    <nav>
+    <a class="brand" href="https://wisfli.com/"><svg viewBox="0 0 60 40" aria-hidden="true"><path d="M0 0h60v40H0z" fill="#14528C"/><path d="M8 8h44v24H8z" fill="#fff"/><path d="M18 14h24v12H18z" fill="#C8322A"/></svg>WISFLI <span class="prod">/ RegimeSwitch Pro</span></a>
+    <nav aria-label="Page">
       <a href="#how">How it works</a>
       <a href="#validation">Validation</a>
+      <a href="#scope" class="opt">Markets</a>
       <a href="#results">Test results</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">Questions</a>
+      <a href="#faq" class="opt">Questions</a>
+      <a class="pill" href="#pricing">Buy</a>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="main">
 
-<section class="hero">
+<div class="hero">
   <div class="wrap">
-    <h1>It works out what kind of market it is in, then decides whether to trade at all.</h1>
-    <p class="lede">
-      RegimeSwitch Pro fits a hidden Markov model to the price history already sitting in your
-      terminal, splits that history into states, and reads the probability of the next state before
-      it sends an order. There is no downloaded signal and no fixed set of indicator thresholds
-      to go stale.
-    </p>
-    <p class="lede">
-      The part that matters commercially is the part most robots leave out: every symbol and
-      timeframe has to pass an out-of-sample edge test before it is allowed to place a single trade.
-      Contexts that fail sit there and do nothing.
-    </p>
-
-    <div class="hero-actions">
-      <a class="cta" href="#pricing">See pricing</a>
-      <a class="cta ghost" href="#results">Read the test report</a>
-      <span class="cta-aside">MetaTrader 5 · one licence per account · Stripe or PayPal</span>
+    <div>
+      <p class="where"><i></i>Self-training regime model for MetaTrader 5</p>
+      <h1 class="long">It works out what kind of market it is in, then decides whether to trade at all.</h1>
+      <p class="lede">RegimeSwitch Pro fits a hidden Markov model to the price history already sitting in your terminal, splits that history into states, and reads the probability of the next state before it sends an order. There is no downloaded signal and no fixed set of indicator thresholds to go stale.</p>
+      <p class="lede">The part that matters is the part most robots leave out: every symbol and timeframe has to pass an out-of-sample edge test before it is allowed to place a single trade. Contexts that fail sit there and do nothing.</p>
+      <div class="actions">
+        <a class="btn brass" href="#pricing">See pricing</a>
+        <a class="btn line" href="#results">Read the test report</a>
+      </div>
+      <p class="aside" style="margin:18px 0 0">MetaTrader 5, one licence per account, Stripe or PayPal</p>
     </div>
 
-    <figure class="regime-figure">
-      <svg viewBox="0 0 960 300" role="img" aria-label="A price series split into five stretches; each stretch is shaded by the hidden state the model assigns to it, with a bar underneath marking positive, flat and negative drift." xmlns="http://www.w3.org/2000/svg">
+    <aside class="instrument" aria-label="What the model produces">
+      <header><b>Regime model<span class="badge">3 STATES</span></b><span>Illustration</span></header>
+      <figure class="inst-fig" style="margin:0;--flat:#8DA4B4;--up:#45C29A;--down:#E8715F;--ink:#DCE6EC;--muted:#8DA4B4">
+<svg viewBox="0 0 960 300" role="img" aria-label="A price series split into five stretches; each stretch is shaded by the hidden state the model assigns to it, with a bar underneath marking positive, flat and negative drift." xmlns="http://www.w3.org/2000/svg">
   <style>
-    .rl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;fill:var(--muted)}
+    .rl{font-family:Archivo,sans-serif;font-size:21px;fill:var(--muted)}
   </style>
-  <rect x="10.0" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.10"/><rect x="10.0" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="188.5" y="18" width="199.6" height="236" fill="var(--up)" opacity="0.10"/><rect x="188.5" y="260" width="197.6" height="10" rx="1" fill="var(--up)" opacity="0.85"/><rect x="388.1" y="18" width="168.0" height="236" fill="var(--down)" opacity="0.10"/><rect x="388.1" y="260" width="166.0" height="10" rx="1" fill="var(--down)" opacity="0.85"/><rect x="556.1" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.10"/><rect x="556.1" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="734.7" y="18" width="215.3" height="236" fill="var(--up)" opacity="0.10"/><rect x="734.7" y="260" width="213.3" height="10" rx="1" fill="var(--up)" opacity="0.85"/>
-  <path d="M10.0 234.4 L15.3 243.3 L20.5 240.6 L25.8 233.3 L31.0 237.0 L36.3 246.7 L41.5 247.2 L46.8 243.7 L52.0 235.7 L57.3 244.6 L62.5 254.0 L67.8 248.9 L73.0 245.4 L78.3 234.2 L83.5 227.1 L88.8 227.8 L94.0 229.8 L99.3 211.1 L104.5 213.2 L109.8 218.9 L115.0 227.2 L120.3 226.5 L125.5 225.4 L130.8 228.0 L136.0 228.4 L141.3 226.4 L146.5 221.4 L151.8 213.4 L157.0 211.8 L162.3 224.9 L167.5 219.8 L172.8 230.1 L178.0 231.4 L183.3 242.1 L188.5 238.6 L193.8 238.5 L199.1 234.0 L204.3 216.0 L209.6 212.7 L214.8 205.5 L220.1 207.8 L225.3 205.5 L230.6 199.1 L235.8 196.0 L241.1 190.8 L246.3 186.9 L251.6 187.7 L256.8 181.7 L262.1 181.8 L267.3 170.1 L272.6 168.8 L277.8 162.2 L283.1 158.7 L288.3 151.0 L293.6 150.1 L298.8 142.2 L304.1 139.2 L309.3 130.2 L314.6 123.9 L319.8 119.8 L325.1 119.7 L330.3 112.8 L335.6 107.2 L340.8 96.5 L346.1 94.7 L351.3 88.7 L356.6 83.0 L361.8 78.2 L367.1 73.8 L372.3 69.4 L377.6 68.5 L382.8 69.4 L388.1 78.3 L393.4 82.6 L398.6 82.6 L403.9 85.1 L409.1 87.3 L414.4 90.7 L419.6 94.5 L424.9 100.7 L430.1 104.1 L435.4 102.9 L440.6 111.5 L445.9 121.8 L451.1 119.7 L456.4 125.6 L461.6 128.1 L466.9 131.1 L472.1 143.4 L477.4 139.1 L482.6 137.9 L487.9 144.1 L493.1 147.6 L498.4 154.1 L503.6 165.3 L508.9 172.8 L514.1 178.1 L519.4 180.0 L524.6 183.7 L529.9 190.5 L535.1 191.2 L540.4 201.8 L545.6 205.2 L550.9 207.0 L556.1 209.2 L561.4 222.2 L566.6 228.8 L571.9 227.1 L577.2 223.2 L582.4 212.0 L587.7 219.3 L592.9 219.3 L598.2 214.5 L603.4 215.7 L608.7 233.0 L613.9 227.1 L619.2 210.2 L624.4 202.9 L629.7 209.6 L634.9 212.6 L640.2 211.0 L645.4 192.8 L650.7 188.3 L655.9 187.5 L661.2 176.2 L666.4 176.8 L671.7 163.2 L676.9 168.2 L682.2 171.7 L687.4 166.4 L692.7 156.0 L697.9 151.3 L703.2 149.1 L708.4 162.3 L713.7 167.5 L718.9 172.0 L724.2 175.9 L729.4 171.6 L734.7 169.5 L739.9 162.6 L745.2 158.7 L750.4 156.6 L755.7 152.6 L760.9 147.2 L766.2 139.9 L771.5 138.5 L776.7 136.0 L782.0 138.4 L787.2 127.9 L792.5 118.0 L797.7 115.2 L803.0 113.8 L808.2 115.7 L813.5 111.4 L818.7 107.0 L824.0 93.9 L829.2 89.3 L834.5 89.2 L839.7 96.4 L845.0 86.7 L850.2 82.3 L855.5 85.8 L860.7 81.5 L866.0 85.0 L871.2 66.3 L876.5 57.9 L881.7 51.9 L887.0 49.1 L892.2 54.9 L897.5 52.0 L902.7 55.2 L908.0 49.1 L913.2 54.9 L918.5 55.4 L923.7 46.5 L929.0 35.8 L934.2 37.4 L939.5 40.6 L944.7 33.3 L950.0 26.0" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <rect x="10.0" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.16"/><rect x="10.0" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="188.5" y="18" width="199.6" height="236" fill="var(--up)" opacity="0.16"/><rect x="188.5" y="260" width="197.6" height="10" rx="1" fill="var(--up)" opacity="0.85"/><rect x="388.1" y="18" width="168.0" height="236" fill="var(--down)" opacity="0.16"/><rect x="388.1" y="260" width="166.0" height="10" rx="1" fill="var(--down)" opacity="0.85"/><rect x="556.1" y="18" width="178.5" height="236" fill="var(--flat)" opacity="0.16"/><rect x="556.1" y="260" width="176.5" height="10" rx="1" fill="var(--flat)" opacity="0.85"/><rect x="734.7" y="18" width="215.3" height="236" fill="var(--up)" opacity="0.16"/><rect x="734.7" y="260" width="213.3" height="10" rx="1" fill="var(--up)" opacity="0.85"/>
+  <path d="M10.0 234.4 L15.3 243.3 L20.5 240.6 L25.8 233.3 L31.0 237.0 L36.3 246.7 L41.5 247.2 L46.8 243.7 L52.0 235.7 L57.3 244.6 L62.5 254.0 L67.8 248.9 L73.0 245.4 L78.3 234.2 L83.5 227.1 L88.8 227.8 L94.0 229.8 L99.3 211.1 L104.5 213.2 L109.8 218.9 L115.0 227.2 L120.3 226.5 L125.5 225.4 L130.8 228.0 L136.0 228.4 L141.3 226.4 L146.5 221.4 L151.8 213.4 L157.0 211.8 L162.3 224.9 L167.5 219.8 L172.8 230.1 L178.0 231.4 L183.3 242.1 L188.5 238.6 L193.8 238.5 L199.1 234.0 L204.3 216.0 L209.6 212.7 L214.8 205.5 L220.1 207.8 L225.3 205.5 L230.6 199.1 L235.8 196.0 L241.1 190.8 L246.3 186.9 L251.6 187.7 L256.8 181.7 L262.1 181.8 L267.3 170.1 L272.6 168.8 L277.8 162.2 L283.1 158.7 L288.3 151.0 L293.6 150.1 L298.8 142.2 L304.1 139.2 L309.3 130.2 L314.6 123.9 L319.8 119.8 L325.1 119.7 L330.3 112.8 L335.6 107.2 L340.8 96.5 L346.1 94.7 L351.3 88.7 L356.6 83.0 L361.8 78.2 L367.1 73.8 L372.3 69.4 L377.6 68.5 L382.8 69.4 L388.1 78.3 L393.4 82.6 L398.6 82.6 L403.9 85.1 L409.1 87.3 L414.4 90.7 L419.6 94.5 L424.9 100.7 L430.1 104.1 L435.4 102.9 L440.6 111.5 L445.9 121.8 L451.1 119.7 L456.4 125.6 L461.6 128.1 L466.9 131.1 L472.1 143.4 L477.4 139.1 L482.6 137.9 L487.9 144.1 L493.1 147.6 L498.4 154.1 L503.6 165.3 L508.9 172.8 L514.1 178.1 L519.4 180.0 L524.6 183.7 L529.9 190.5 L535.1 191.2 L540.4 201.8 L545.6 205.2 L550.9 207.0 L556.1 209.2 L561.4 222.2 L566.6 228.8 L571.9 227.1 L577.2 223.2 L582.4 212.0 L587.7 219.3 L592.9 219.3 L598.2 214.5 L603.4 215.7 L608.7 233.0 L613.9 227.1 L619.2 210.2 L624.4 202.9 L629.7 209.6 L634.9 212.6 L640.2 211.0 L645.4 192.8 L650.7 188.3 L655.9 187.5 L661.2 176.2 L666.4 176.8 L671.7 163.2 L676.9 168.2 L682.2 171.7 L687.4 166.4 L692.7 156.0 L697.9 151.3 L703.2 149.1 L708.4 162.3 L713.7 167.5 L718.9 172.0 L724.2 175.9 L729.4 171.6 L734.7 169.5 L739.9 162.6 L745.2 158.7 L750.4 156.6 L755.7 152.6 L760.9 147.2 L766.2 139.9 L771.5 138.5 L776.7 136.0 L782.0 138.4 L787.2 127.9 L792.5 118.0 L797.7 115.2 L803.0 113.8 L808.2 115.7 L813.5 111.4 L818.7 107.0 L824.0 93.9 L829.2 89.3 L834.5 89.2 L839.7 96.4 L845.0 86.7 L850.2 82.3 L855.5 85.8 L860.7 81.5 L866.0 85.0 L871.2 66.3 L876.5 57.9 L881.7 51.9 L887.0 49.1 L892.2 54.9 L897.5 52.0 L902.7 55.2 L908.0 49.1 L913.2 54.9 L918.5 55.4 L923.7 46.5 L929.0 35.8 L934.2 37.4 L939.5 40.6 L944.7 33.3 L950.0 26.0" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
   <text x="99" y="292" text-anchor="middle" class="rl">drift ~0</text><text x="288" y="292" text-anchor="middle" class="rl">drift +</text><text x="472" y="292" text-anchor="middle" class="rl">drift −</text><text x="645" y="292" text-anchor="middle" class="rl">drift ~0</text><text x="842" y="292" text-anchor="middle" class="rl">drift +</text>
 </svg>
-      <figcaption>
-        What the model produces: the same series cut into stretches, each one labelled with the
-        state the model believes generated it. Drift and volatility are estimated per state, so a
-        quiet range and a fast sell-off are never treated as the same market.
-      </figcaption>
-    </figure>
+      </figure>
+      <dl class="inst-grid">
+        <div><dt>Profit factor</dt><dd>1.27</dd></div>
+        <div><dt>Trades</dt><dd>376</dd></div>
+        <div><dt>Max balance DD</dt><dd>6.65%</dd></div>
+        <div><dt>Winning trades</dt><dd>58.2%</dd></div>
+      </dl>
+      <p class="inst-foot">The same series cut into stretches, each labelled with the state the model believes generated it. Drift and volatility are estimated per state, so a quiet range and a fast sell-off are never treated as the same market. Figures: one Strategy Tester run, five symbols, January 2025 to August 2026.</p>
+    </aside>
   </div>
-</section>
+</div>
+
+<div class="principles">
+  <div class="wrap">
+    <div><h3>Trained on your own terminal</h3><p>The model fits the history your broker gives you. No downloaded signal, no thresholds frozen years ago.</p></div>
+    <div><h3>No out-of-sample edge, no trade</h3><p>Contexts that fail validation are marked not tradable until the next retraining produces something better.</p></div>
+    <div><h3>Never averages down</h3><p>An ATR stop on every entry, no grid, no martingale, no recovery mode. Losses are taken at the stop.</p></div>
+  </div>
+</div>
 
 <section id="how">
   <div class="wrap">
-    <p class="section-note">01 — how it works</p>
-    <h2>Two independent reasons to enter, and a switch that says which one is in charge</h2>
+    <div class="head solo">
+      <h2>Two independent reasons to enter, and a switch that says which one is in charge</h2>
+    </div>
 
-    <div class="two-col">
+    <div class="cols-2 prose">
       <div>
         <h3>The regime model</h3>
-        <p>
-          Each bar is reduced to two numbers: the log return over the last K bars and the bar
-          range relative to price. A Gaussian hidden Markov model with three states is fitted to
-          2,500 bars of that series using Baum–Welch, restarted six times from different random
-          seeds so a single unlucky start cannot decide the outcome.
-        </p>
-        <p>
-          The forward filter then gives the state probabilities at the current bar, the transition
-          matrix projects them one step ahead, and the expected move is the probability-weighted
-          drift over a horizon taken from each state's own persistence. A state the model expects
-          to last twenty bars gets a longer horizon than one it expects to last three.
-        </p>
+        <p>Each bar is reduced to two numbers: the log return over the last K bars and the bar range relative to price. A Gaussian hidden Markov model with three states is fitted to 2,500 bars of that series using Baum–Welch, restarted six times from different random seeds so a single unlucky start cannot decide the outcome.</p>
+        <p>The forward filter then gives the state probabilities at the current bar, the transition matrix projects them one step ahead, and the expected move is the probability-weighted drift over a horizon taken from each state's own persistence. A state the model expects to last twenty bars gets a longer horizon than one it expects to last three.</p>
       </div>
       <div>
         <h3>The reversal module</h3>
-        <p>
-          A stochastic %K/%D crossover inside the oversold or overbought zone, confirmed by a bar
-          whose volume is at least 1.5× the recent average. Familiar, and deliberately so: it is
-          the kind of rule a discretionary trader already reads off the chart.
-        </p>
-        <p>
-          What is not familiar is that the robot measures it rather than assuming it. Every
-          retraining cycle it replays the rule across the available history, records the average
-          return six bars after each signal, long and short separately, and keeps the result.
-        </p>
+        <p>A stochastic %K/%D crossover inside the oversold or overbought zone, confirmed by a bar whose volume is at least 1.5× the recent average. Familiar, and deliberately so: it is the kind of rule a discretionary trader already reads off the chart.</p>
+        <p>What is not familiar is that the robot measures it rather than assuming it. Every retraining cycle it replays the rule across the available history, records the average return six bars after each signal, long and short separately, and keeps the result.</p>
       </div>
     </div>
 
-    <table class="states">
-      <thead>
-        <tr><th>Entry mode</th><th>What opens a position</th><th>Typical use</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="chip up"></span>HMM only</td>
-          <td>The regime model alone: probability above threshold and expected move above a
-              fraction of ATR.</td>
-          <td>Trend and continuation work on H4 and above.</td>
-        </tr>
-        <tr>
-          <td><span class="chip flat"></span>Reversal only</td>
-          <td>The stochastic and volume rule alone, provided its measured edge is positive.</td>
-          <td>Fast mean reversion on M30 and H1.</td>
-        </tr>
-        <tr>
-          <td><span class="chip up"></span>Reversal, HMM veto</td>
-          <td>The reversal fires, but the trade is dropped when the regime model points the other
-              way. This is the default.</td>
-          <td>The configuration used in the published test.</td>
-        </tr>
-        <tr>
-          <td><span class="chip down"></span>Either</td>
-          <td>Whichever fires first, each still subject to its own validation gate.</td>
-          <td>More trades, more exposure, more variance.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-scroll" style="margin-top:56px">
+      <table class="data">
+        <thead><tr><th>Entry mode</th><th>What opens a position</th><th>Typical use</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mode up"></span><b>HMM only</b></td><td>The regime model alone: probability above threshold and expected move above a fraction of ATR.</td><td>Trend and continuation work on H4 and above.</td></tr>
+          <tr><td><span class="mode flat"></span><b>Reversal only</b></td><td>The stochastic and volume rule alone, provided its measured edge is positive.</td><td>Fast mean reversion on M30 and H1.</td></tr>
+          <tr><td><span class="mode up"></span><b>Reversal, HMM veto</b> <span class="default">default</span></td><td>The reversal fires, but the trade is dropped when the regime model points the other way.</td><td>The configuration used in the published test.</td></tr>
+          <tr><td><span class="mode down"></span><b>Either</b></td><td>Whichever fires first, each still subject to its own validation gate.</td><td>More trades, more exposure, more variance.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
-<section id="validation">
+<section id="validation" class="dark">
   <div class="wrap">
-    <p class="section-note">02 — the part that refuses to trade</p>
-    <h2>A model that fits beautifully and predicts nothing is still a failure</h2>
-    <p>
-      Any estimator will find structure in 2,500 bars. The question is whether that structure
-      survives contact with data the fitting never saw. RegimeSwitch Pro holds back the last
-      quarter of the training window, replays its own entry logic there, and measures the average
-      forward return of the signals it would have taken. The result is expressed in basis points
-      per bar and printed in the journal.
-    </p>
+    <div class="head">
+      <h2>A model that fits beautifully and predicts nothing is still a failure</h2>
+      <p>Any estimator will find structure in 2,500 bars. The question is whether that structure survives contact with data the fitting never saw.</p>
+    </div>
 
+    <div class="cols-2 code-grid">
+      <div>
+        <p>RegimeSwitch Pro holds back the last quarter of the training window, replays its own entry logic there, and measures the average forward return of the signals it would have taken. The result is expressed in basis points per bar and printed in the journal.</p>
 <pre><span class="c">// Out-of-sample gate: replay the entry rule on held-back data</span>
 <span class="k">for</span>(<span class="k">int</span> t=startIdx; t&lt;T-1; t++)
 {
@@ -189,18 +409,10 @@ m.valEdgeBp = ((sumL-sumS)/m.valSignals)*1e4;
 
 <span class="c">// No positive edge out of sample, no trading. No exceptions.</span>
 <span class="k">return</span> (m.valSignals&gt;=InpMinValSignals &amp;&amp; m.valEdgeBp&gt;InpMinValEdgeBp);</pre>
-    <p class="code-caption">
-      From the shipped source. When this returns false the context is marked not tradable and is
-      skipped until the next retraining cycle produces something better.
-    </p>
-
-    <p>
-      The reversal module is held to the same standard, and because it is a fixed rule rather than
-      a fitted model, the measurement is direct: count the signals, look six bars forward, average.
-      Fewer than twenty signals in the window, or a negative edge, and that symbol and timeframe
-      stops taking reversal entries.
-    </p>
-
+        <p class="code-caption">From the shipped source. When this returns false the context is marked not tradable and is skipped until the next retraining cycle produces something better.</p>
+      </div>
+      <div>
+        <p>The reversal module is held to the same standard, and because it is a fixed rule rather than a fitted model, the measurement is direct: count the signals, look six bars forward, average. Fewer than twenty signals in the window, or a negative edge, and that symbol and timeframe stops taking reversal entries.</p>
 <pre><span class="c">// The reversal rule, evaluated only on closed bars</span>
 <span class="k">bool</span> volOK = (v[t] &gt; InpVolFactor*volAvg);      <span class="c">// 1.5x the 10-bar mean</span>
 <span class="k">if</span>(!volOK) <span class="k">return</span> 0;
@@ -211,141 +423,97 @@ m.valEdgeBp = ((sumL-sumS)/m.valSignals)*1e4;
 <span class="k">if</span>(crossUp   &amp;&amp; MathMin(k[t],k[t-1])&lt;=InpOversold)   <span class="k">return</span> +1;
 <span class="k">if</span>(crossDown &amp;&amp; MathMax(k[t],k[t-1])&gt;=InpOverbought) <span class="k">return</span> -1;
 <span class="k">return</span> 0;</pre>
-    <p class="code-caption">
-      Every rule in the product is this legible. You can read what opens a position, and you can
-      read what closes it.
-    </p>
+        <p class="code-caption">Every rule in the product is this legible. You can read what opens a position, and you can read what closes it.</p>
+      </div>
+    </div>
 
     <div class="cols-3">
-      <div>
-        <h3>Retrains as it runs</h3>
-        <p>
-          Every 250 bars each context refits and revalidates, one at a time so the terminal never
-          freezes. Models are written to disk and reloaded on restart.
-        </p>
-      </div>
-      <div>
-        <h3>Reports what it is thinking</h3>
-        <p>
-          An hourly journal table lists every symbol and timeframe with its state, probability,
-          measured edge, signal count and the reason it did or did not trade.
-        </p>
-      </div>
-      <div>
-        <h3>Never averages down</h3>
-        <p>
-          One position per symbol by default, an ATR stop on every entry, no grid, no martingale,
-          no recovery mode. Losses are taken at the stop.
-        </p>
-      </div>
+      <div><h3>Retrains as it runs</h3><p>Every 250 bars each context refits and revalidates, one at a time so the terminal never freezes. Models are written to disk and reloaded on restart.</p></div>
+      <div><h3>Reports what it is thinking</h3><p>An hourly journal table lists every symbol and timeframe with its state, probability, measured edge, signal count and the reason it did or did not trade.</p></div>
+      <div><h3>Never averages down</h3><p>One position per symbol by default, an ATR stop on every entry, no grid, no martingale, no recovery mode. Losses are taken at the stop.</p></div>
     </div>
   </div>
 </section>
 
 <section id="scope">
   <div class="wrap">
-    <p class="section-note">03 — one chart, many markets</p>
-    <h2>Twenty-eight pairs and ten timeframes from a single window</h2>
-    <p>
-      Attach it once. Each symbol carries its own list of timeframes, and each symbol-timeframe
-      pair becomes an independent context with its own indicator handles, its own trained model and
-      its own magic number. Up to eighty contexts on one chart, and they do not interfere with each
-      other or with anything else running on your account.
-    </p>
+    <div class="head">
+      <h2>Twenty-eight pairs and ten timeframes from a single window</h2>
+      <p>Attach it once. Each symbol carries its own list of timeframes, and each symbol-timeframe pair becomes an independent context with its own indicator handles, its own trained model and its own magic number. Up to eighty contexts on one chart, and they do not interfere with each other or with anything else running on your account.</p>
+    </div>
 
+    <div class="cols-2">
+      <div>
 <pre><span class="c">// The whole universe, in one input string</span>
 InpPreset     = PRESET_MAJORS;
 InpSymbolSpec = <span class="s">"EURUSD:H1,H4; GBPUSD:H4; USDJPY:M30; USDCHF:H4; USDCAD:H4;"</span>;
 InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m", "_raw" — matches your broker</span></pre>
-    <p class="code-caption">
-      Presets cover the seven majors, the twenty-one crosses, or all twenty-eight. The spec string
-      overrides or extends them per symbol.
-    </p>
-
-    <table class="states">
-      <thead>
-        <tr><th>Control</th><th>What it does</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Risk per trade</td><td>Position size computed from equity, the ATR stop distance and the tick value of the instrument. Fixed lot available.</td></tr>
-        <tr><td>Stop and target</td><td>ATR multiples, with an optional ATR trailing stop that follows the position once it moves your way.</td></tr>
-        <tr><td>Exposure caps</td><td>A hard ceiling on open positions in total and per symbol, so a correlated cluster cannot open at once.</td></tr>
-        <tr><td>Spread guard</td><td>Entries are skipped when the spread is above your limit, which matters at rollover and on news.</td></tr>
-        <tr><td>Exits</td><td>Stop, target, trailing stop, opposite reversal signal, or a flip in the model's direction — each switchable.</td></tr>
-        <tr><td>On-chart panel</td><td>A live summary of the busiest contexts: state, probability, edge and open positions.</td></tr>
-      </tbody>
-    </table>
+        <p class="code-caption">Presets cover the seven majors, the twenty-one crosses, or all twenty-eight. The spec string overrides or extends them per symbol.</p>
+      </div>
+      <table class="data" style="margin-top:28px">
+        <tbody>
+          <tr><th scope="row">Risk per trade</th><td>Position size computed from equity, the ATR stop distance and the tick value of the instrument. Fixed lot available.</td></tr>
+          <tr><th scope="row">Stop and target</th><td>ATR multiples, with an optional ATR trailing stop that follows the position once it moves your way.</td></tr>
+          <tr><th scope="row">Exposure caps</th><td>A hard ceiling on open positions in total and per symbol, so a correlated cluster cannot open at once.</td></tr>
+          <tr><th scope="row">Spread guard</th><td>Entries are skipped when the spread is above your limit, which matters at rollover and on news.</td></tr>
+          <tr><th scope="row">Exits</th><td>Stop, target, trailing stop, opposite reversal signal, or a flip in the model's direction, each switchable.</td></tr>
+          <tr><th scope="row">On-chart panel</th><td>A live summary of the busiest contexts: state, probability, edge and open positions.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
-<section id="results">
+<section id="results" class="dark">
   <div class="wrap">
-    <p class="section-note">04 — test results</p>
-    <h2>The numbers, and everything wrong with them</h2>
-    <p>
-      One Strategy Tester run, five symbols, 100% real ticks from a live Vantage Markets server,
-      1 January 2025 to 2 August 2026. Default settings: reversal with regime veto, 1% risk per
-      trade, 2×ATR stop, 3×ATR target, trailing on, ten positions maximum.
-    </p>
+    <div class="head">
+      <h2>The numbers, and everything wrong with them</h2>
+      <p>One Strategy Tester run, five symbols, 100% real ticks from a live Vantage Markets server, 1 January 2025 to 2 August 2026. Default settings: reversal with regime veto, 1% risk per trade, 2×ATR stop, 3×ATR target, trailing on, ten positions maximum.</p>
+    </div>
 
-    <div class="figures">
+    <div class="board">
       <div><b>1.27</b><span>Profit factor</span></div>
       <div><b>376</b><span>Trades</span></div>
       <div><b>6.65%</b><span>Maximum balance drawdown</span></div>
       <div><b>58.2%</b><span>Winning trades</span></div>
     </div>
 
-    <div class="shots">
+    <div class="cols-2 shots">
       <figure>
-        <img src="report/ReportTester-27085970.png" alt="Balance curve rising over the test period with several flat stretches and pullbacks.">
+        <img src="report/ReportTester-27085970.png" alt="Balance curve rising over the test period with several flat stretches and pullbacks." loading="lazy">
         <figcaption>Balance over 376 trades. The flat stretches are contexts sitting out after failing validation.</figcaption>
       </figure>
       <figure>
-        <img src="report/ReportTester-27085970-mfemae.png" alt="Scatter of trade profit against maximum favourable and adverse excursion.">
+        <img src="report/ReportTester-27085970-mfemae.png" alt="Scatter of trade profit against maximum favourable and adverse excursion." loading="lazy">
         <figcaption>Profit against maximum favourable and adverse excursion. The band of losses near −110 is the ATR stop doing its job.</figcaption>
       </figure>
     </div>
 
     <div class="caveat">
       <h3>Read this before you read the report</h3>
-      <p>
-        The run was made in the tester's pip-based profit mode. That means commission and swap are
-        not included, so no cash return or percentage gain is quoted anywhere on this page, and you
-        should not infer one. What the run does support is the shape of the thing: the win rate,
-        the ratio of average win to average loss, the trade count and the drawdown relative to the
-        stop size.
-      </p>
-      <p>
-        It is also a single window on a single broker's data. Nineteen months and 376 trades is
-        enough to be interesting and nowhere near enough to be conclusive. The model trains on
-        whatever history your own terminal holds, so your results will differ from this run by
-        construction.
-      </p>
-      <p>
-        Run it on a demo account with your broker's spreads and commissions before you risk money.
-        That is not a disclaimer, it is the correct next step.
-      </p>
+      <p>The run was made in the tester's pip-based profit mode. That means commission and swap are not included, so no cash return or percentage gain is quoted anywhere on this page, and you should not infer one. What the run does support is the shape of the thing: the win rate, the ratio of average win to average loss, the trade count and the drawdown relative to the stop size.</p>
+      <p>It is also a single window on a single broker's data. Nineteen months and 376 trades is enough to be interesting and nowhere near enough to be conclusive. The model trains on whatever history your own terminal holds, so your results will differ from this run by construction.</p>
+      <p>Run it on a demo account with your broker's spreads and commissions before you risk money. That is not a disclaimer, it is the correct next step.</p>
     </div>
 
-    <p class="buy-note">
-      <a href="ReportTester-27085970.html">Open the full Strategy Tester report</a> — every
-      trade, every input, unedited.
-    </p>
+    <div class="actions" style="margin-top:36px">
+      <a class="btn brass" href="ReportTester-27085970.html">Open the full Strategy Tester report</a>
+      <span class="aside">Every trade, every input, unedited.</span>
+    </div>
   </div>
 </section>
 
-<section id="pricing">
+<section id="pricing" class="panel">
   <div class="wrap">
-    <p class="section-note">05 — pricing</p>
-    <h2>Rent it monthly, or buy it once</h2>
-    <p>
-      Both options include the compiled expert advisor, the full input reference, the default
-      configuration used in the published test, and email support from the person who wrote it.
-    </p>
+    <div class="head">
+      <h2>Rent it monthly, or buy it once</h2>
+      <p>Both options include the compiled expert advisor, the full input reference, the default configuration used in the published test, and email support from the person who wrote it.</p>
+    </div>
 
     <div class="plans">
       <div class="plan">
         <h3>Monthly</h3>
+        <p class="who">For running it live without committing up front.</p>
         <p class="price">€39<small> / month</small></p>
         <p class="was">Cancel any time, from your own Stripe or PayPal receipt.</p>
         <ul>
@@ -354,168 +522,152 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
           <li>Email support</li>
           <li>Free account transfer</li>
         </ul>
-        <div class="buy-row">
+        <div class="pay-slot">
           <div id="paypal-button-container-P-2EA83729XE4434916NKTILZI"></div>
-<script src="https://www.paypal.com/sdk/js?client-id=AWa_6Af93UGQdocFcdOmDgC6xGjFV4Kp-8yeFyZ6DhHqPDnHt6kK5xQdSenwitI1-a0kk4Sc4DeCYK9N&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-<script>
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
-      },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({
-          /* Creates the subscription */
-          plan_id: 'P-2EA83729XE4434916NKTILZI'
-        });
-      },
-      onApprove: function(data, actions) {
-        alert(data.subscriptionID); // You can add optional success message for the subscriber here
-      }
-  }).render('#paypal-button-container-P-2EA83729XE4434916NKTILZI'); // Renders the PayPal button
-</script>
         </div>
       </div>
 
-      <div class="plan featured">
+      <div class="plan pick">
+        <span class="tag">Launch price</span>
         <h3>Lifetime licence</h3>
+        <p class="who">For traders who have run it on demo and want to keep it.</p>
         <p class="price">€249<small> once</small></p>
-        <p class="was">Launch price. Going to €329 after the first ten licences.</p>
+        <p class="was">Going to €329 after the first ten licences.</p>
         <ul>
           <li>One MetaTrader 5 account, no expiry</li>
           <li>All version 2.x updates included</li>
           <li>Priority email support</li>
           <li>Free account transfer</li>
         </ul>
-        <div class="buy-row">
-          <script async
-  src="https://js.stripe.com/v3/buy-button.js">
-</script>
-
-<stripe-buy-button
-  buy-button-id="buy_btn_1UFBRf9abIQixlisOyLEXGhu"
-  publishable-key="pk_live_51TZyif9abIQixliscbpfVG3y2wD28GUvAfE7BnvbENBMOyUQMqE4Dh954G2zII0HNpZ6dTZxUJg4kpncQrUL266Z00nJ9nMGOT"
->
-</stripe-buy-button>
+        <div class="pay-slot">
+          <stripe-buy-button
+            buy-button-id="buy_btn_1UFBRf9abIQixlisOyLEXGhu"
+            publishable-key="pk_live_51TZyif9abIQixliscbpfVG3y2wD28GUvAfE7BnvbENBMOyUQMqE4Dh954G2zII0HNpZ6dTZxUJg4kpncQrUL266Z00nJ9nMGOT">
+          </stripe-buy-button>
         </div>
       </div>
     </div>
 
-    <p class="buy-note">
-      Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for.
-      Changing broker or account is free — write in and the key is reissued. Software is delivered
-      by email, normally within a few hours and always within one working day.
-    </p>
+    <p class="hint">Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for. Changing broker or account is free: write in and the key is reissued. Software is delivered by email, normally within a few hours and always within one working day. Paying with PayPal? You will be taken to <a href="activate.html">the activation page</a> to send your account number.</p>
   </div>
 </section>
 
 <section id="start">
   <div class="wrap">
-    <p class="section-note">06 — getting started</p>
-    <h2>From payment to first signal</h2>
+    <div class="head solo"><h2>From payment to first signal</h2></div>
     <ol class="steps">
-      <li>
-        <b>Pay and send your account number</b>
-        <p>Stripe asks for it at checkout. If you pay with PayPal, the confirmation page collects
-           it instead. It is the login number of the MT5 account you want to run, demo or live.</p>
-      </li>
-      <li>
-        <b>Drop the file into MQL5/Experts and restart</b>
-        <p>The compiled <a href="HMM_Regime_MultiEA_v20.ex5">.ex5</a> goes in the Experts folder of your terminal's data directory. Refresh
-           the Navigator and it appears.</p>
-      </li>
-      <li>
-        <b>Paste the key and pick your universe</b>
-        <p>One key field, one symbol spec string. Start with the default: majors, reversal with
-           regime veto, 1% risk.</p>
-      </li>
-      <li>
-        <b>Let it warm up</b>
-        <p>Each context trains once before it can trade, one at a time so the terminal stays
-           responsive. On a full universe allow a few minutes. The journal table tells you exactly
-           where it is.</p>
-      </li>
-      <li>
-        <b>Watch the journal before you go live</b>
-        <p>The hourly table shows which contexts passed validation and which are sitting out. If
-           most of your universe is sitting out, that is information, not a fault.</p>
-      </li>
+      <li><b>Pay and send your account number</b><p>Stripe asks for it at checkout. If you pay with PayPal, the confirmation page collects it instead. It is the login number of the MT5 account you want to run, demo or live.</p></li>
+      <li><b>Drop the file into MQL5/Experts and restart</b><p>The compiled <a href="HMM_Regime_MultiEA_v20.ex5">.ex5</a> goes in the Experts folder of your terminal's data directory. Refresh the Navigator and it appears.</p></li>
+      <li><b>Paste the key and pick your universe</b><p>One key field, one symbol spec string. Start with the default: majors, reversal with regime veto, 1% risk.</p></li>
+      <li><b>Let it warm up</b><p>Each context trains once before it can trade, one at a time so the terminal stays responsive. On a full universe allow a few minutes. The journal table tells you exactly where it is.</p></li>
+      <li><b>Watch the journal before you go live</b><p>The hourly table shows which contexts passed validation and which are sitting out. If most of your universe is sitting out, that is information, not a fault.</p></li>
     </ol>
   </div>
 </section>
 
-<section id="faq" class="faq">
+<section id="faq" class="panel">
   <div class="wrap">
-    <p class="section-note">07 — questions</p>
-    <h2>Things worth asking before you buy</h2>
+    <div class="head solo"><h2>Things worth asking before you buy</h2></div>
+    <div class="faq-list">
+      <details>
+        <summary>Do I need to know what a hidden Markov model is?</summary>
+        <p>No. You need to know that the robot estimates which of three market states it is in, that it will not trade a symbol whose model failed its own test, and that you set the risk. The mathematics is documented for people who want it and ignorable for people who do not.</p>
+      </details>
+      <details>
+        <summary>Will it work on my broker?</summary>
+        <p>It works on any MetaTrader 5 broker with hedging or netting, and handles symbol suffixes like <code>.ecn</code> or <code>_raw</code> through one input. Spread and commission decide whether it is profitable for you, which is why the demo run comes first.</p>
+      </details>
+      <details>
+        <summary>How much history does it need?</summary>
+        <p>2,500 bars per context by default, plus the validation slice. On H4 that is roughly two years. Scroll the chart back in the terminal once so the history downloads, and the models train themselves from there.</p>
+      </details>
+      <details>
+        <summary>Can I run it on a VPS?</summary>
+        <p>Yes, and you should if you want it running overnight. Training is spread across bars rather than done in one blocking pass, so a modest VPS handles a full universe.</p>
+      </details>
+      <details>
+        <summary>What happens when the market changes?</summary>
+        <p>Every 250 bars each context refits on the most recent window and revalidates. A setup that worked last quarter and stopped working drops out of the tradable set on its own. That is the entire point of the design.</p>
+      </details>
+      <details>
+        <summary>Is there a refund?</summary>
+        <p>Licence keys cannot be recalled once issued, so purchases are final. That is exactly why the test report is published unedited, the rules are documented, and you are told to run a demo first. If something does not work as described, write in and it gets fixed.</p>
+      </details>
+      <details>
+        <summary>Will you sell me a copy without the licence check?</summary>
+        <p>No.</p>
+      </details>
+    </div>
+  </div>
+</section>
 
-    <details>
-      <summary>Do I need to know what a hidden Markov model is?</summary>
-      <p>No. You need to know that the robot estimates which of three market states it is in, that
-         it will not trade a symbol whose model failed its own test, and that you set the risk. The
-         mathematics is documented for people who want it and ignorable for people who do not.</p>
-    </details>
-
-    <details>
-      <summary>Will it work on my broker?</summary>
-      <p>It works on any MetaTrader 5 broker with hedging or netting, and handles symbol suffixes
-         like <code>.ecn</code> or <code>_raw</code> through one input. Spread and commission decide
-         whether it is profitable for you, which is why the demo run comes first.</p>
-    </details>
-
-    <details>
-      <summary>How much history does it need?</summary>
-      <p>2,500 bars per context by default, plus the validation slice. On H4 that is roughly two
-         years. Scroll the chart back in the terminal once so the history downloads, and the models
-         train themselves from there.</p>
-    </details>
-
-    <details>
-      <summary>Can I run it on a VPS?</summary>
-      <p>Yes, and you should if you want it running overnight. Training is spread across bars
-         rather than done in one blocking pass, so a modest VPS handles a full universe.</p>
-    </details>
-
-    <details>
-      <summary>What happens when the market changes?</summary>
-      <p>Every 250 bars each context refits on the most recent window and revalidates. A setup that
-         worked last quarter and stopped working drops out of the tradable set on its own. That is
-         the entire point of the design.</p>
-    </details>
-
-    <details>
-      <summary>Is there a refund?</summary>
-      <p>Licence keys cannot be recalled once issued, so purchases are final. That is exactly why
-         the test report is published unedited, the rules are documented, and you are told to run a
-         demo first. If something does not work as described, write in and it gets fixed.</p>
-    </details>
-
-    <details>
-      <summary>Will you sell me a copy without the licence check?</summary>
-      <p>No.</p>
-    </details>
+<section class="contact">
+  <div class="wrap">
+    <h2>Questions the page doesn't answer?</h2>
+    <div>
+      <p>Write to the person who wrote the code. You will get a straight answer about whether it fits your broker, your capital and the way you trade.</p>
+      <p style="margin-top:14px"><a class="mail" href="mailto:jsgastoniriartecabrera@gmail.com">jsgastoniriartecabrera@gmail.com</a></p>
+    </div>
   </div>
 </section>
 
 </main>
 
-<footer class="site-footer">
+<footer>
   <div class="wrap">
-    <p class="risk">
-      Trading foreign exchange and CFDs on margin carries a high level of risk and can result in the
-      loss of all of your capital. Backtested and simulated results do not represent actual trading
-      and have inherent limitations, including the benefit of hindsight. Past performance does not
-      indicate future results. RegimeSwitch Pro is trading software, not investment advice, and no
-      outcome is promised or implied. Only trade with money you can afford to lose.
-    </p>
-    <div class="footer-line">
-      <span>© 2026 Wisfli · <a href="terms.html">Terms and licence</a> · <a href="activate.html">Activate a purchase</a></span>
-      <span><a href="mailto:jsgastoniriartecabrera@gmail.com">jsgastoniriartecabrera@gmail.com</a></span>
+    <div class="cols">
+      <div>
+        <a class="brand" href="https://wisfli.com/"><svg viewBox="0 0 60 40" aria-hidden="true"><path d="M0 0h60v40H0z" fill="#14528C"/><path d="M8 8h44v24H8z" fill="#fff"/><path d="M18 14h24v12H18z" fill="#C8322A"/></svg>WISFLI</a>
+        <p style="margin:0;max-width:26em">RegimeSwitch Pro is built and supported by one person in Alicante.</p>
+      </div>
+      <div>
+        <h4>RegimeSwitch Pro</h4>
+        <ul>
+          <li><a href="activate.html">Activate a purchase</a></li>
+          <li><a href="terms.html">Terms and licence</a></li>
+          <li><a href="ReportTester-27085970.html">Strategy Tester report</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Wisfli</h4>
+        <ul>
+          <li><a href="https://wisfli.com/">wisfli.com</a></li>
+          <li><a href="https://jsgaston.github.io/candlegrid-web-en/">CandleGrid Pro</a></li>
+          <li><a href="https://jsgaston.github.io/armada/">Armada signal</a></li>
+          <li><a href="mailto:jsgastoniriartecabrera@gmail.com">Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <p>Trading foreign exchange and CFDs on margin carries a high level of risk and can result in the loss of all of your capital. Backtested and simulated results do not represent actual trading and have inherent limitations, including the benefit of hindsight. Past performance does not indicate future results. RegimeSwitch Pro is trading software, not investment advice, and no outcome is promised or implied. Only trade with money you can afford to lose.</p>
+      <p>© <span id="yr">2026</span> Wisfli. Trading as Javier Santiago Gastón de Iriarte Cabrera, Tax ID 47033535F, Alicante, Spain.</p>
     </div>
   </div>
 </footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+<!-- Payment buttons.
+     disable-funding=card,credit stops PayPal injecting its floating menu over the sticky header. -->
+<script src="https://js.stripe.com/v3/buy-button.js" async></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AWa_6Af93UGQdocFcdOmDgC6xGjFV4Kp-8yeFyZ6DhHqPDnHt6kK5xQdSenwitI1-a0kk4Sc4DeCYK9N&vault=true&intent=subscription&currency=EUR&disable-funding=card,credit" data-sdk-integration-source="button-factory"></script>
+<script>
+  if (window.paypal) {
+    paypal.Buttons({
+      fundingSource: paypal.FUNDING.PAYPAL,
+      style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
+      createSubscription: function (data, actions) {
+        return actions.subscription.create({ plan_id: 'P-2EA83729XE4434916NKTILZI' });
+      },
+      onApprove: function (data) {
+        window.location.href = 'activate.html?sub=' + encodeURIComponent(data.subscriptionID);
+      },
+      onError: function (err) {
+        console.error('PayPal:', err);
+      }
+    }).render('#paypal-button-container-P-2EA83729XE4434916NKTILZI');
+  }
+</script>
 
 </body>
 </html>
