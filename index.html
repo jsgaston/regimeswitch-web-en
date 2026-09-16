@@ -827,6 +827,7 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
       return;
     }
     var R=sc.returns||{}, K=sc.risk||{}, T=sc.trades||{};
+    if(sc.tl&&sc.tl.p&&sc.tl.p.length){ sc.net=Math.round(sc.tl.p.reduce(function(a,b){return a+(+b||0);},0)*100)/100; }  /* net = its own closed trades */
     var money_on=A.publish_money && !nil(sc.net);
     var big = money_on ? money(sc.net,true) : pct(R.total_pct);
     var since = T.first_trade ? fdate(T.first_trade) : (st&&st.since?fdate(st.since):'');
