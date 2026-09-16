@@ -285,6 +285,22 @@ footer .legal strong{color:var(--dmuted)}
 .shots figure{margin:0;background:var(--abyss-2);border:1px solid var(--drule-2)}
 .shots img{width:100%;background:#fff}
 .shots figcaption{padding:14px 18px;font:400 13.5px/1.55 Archivo;color:var(--dmuted)}
+/* live record from Armada (this bot only) */
+.live-card .lv-flag svg{width:27px;height:18px;display:inline-block;vertical-align:-3px;margin-right:10px}
+.lv-body{display:grid;grid-template-columns:.9fr 1.1fr;gap:0;align-items:stretch;border-bottom:1px solid var(--drule)}
+.lv-body .inst-big{padding:24px 22px 18px;border-right:1px solid var(--drule);display:block}
+.lv-body .inst-big .num{display:block;margin:0 0 10px}
+.lv-body .inst-big .lab{display:block;line-height:1.5}
+.lv-side{margin:18px 0 0;padding:0;list-style:none;font:500 13px/1.5 Archivo;color:var(--dmuted)}
+.lv-side li{padding:7px 0;border-top:1px solid var(--drule);display:flex;justify-content:space-between;gap:14px}
+.lv-side li b{color:var(--dtext);font-weight:600;text-align:right}
+.lv-chart{position:relative;padding:14px 12px 6px;min-height:230px}
+.lv-chart svg{display:block;width:100%;height:auto}
+.lv-cap{font:500 12px Archivo;color:var(--dmuted);margin:4px 10px 8px}
+.lv-empty{grid-column:1/-1;padding:44px 22px;text-align:center;font:500 14.5px/1.6 Archivo;color:var(--dmuted)}
+.lv-empty b{display:block;color:#fff;font-size:17px;margin-bottom:6px}
+.live-card .pos{color:var(--sig)} .live-card .neg{color:var(--sig-down)}
+@media (max-width:760px){.lv-body{grid-template-columns:1fr}.lv-body .inst-big{border-right:0;border-bottom:1px solid var(--drule)}}
 </style>
 </head>
 <body>
@@ -296,6 +312,7 @@ footer .legal strong{color:var(--dmuted)}
     <nav aria-label="Page">
       <a href="#how">How it works</a>
       <a href="#validation">Validation</a>
+      <a href="#live">Live in Armada</a>
       <a href="#scope" class="opt">Markets</a>
       <a href="#results">Test results</a>
       <a href="#faq" class="opt">Questions</a>
@@ -464,6 +481,37 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
   </div>
 </section>
 
+<section id="live" class="panel">
+  <div class="wrap">
+    <div class="head">
+      <h2>Trading live in Armada</h2>
+      <p>RegimeSwitch Pro runs in the Armada copy-trading account under signal flag B. This panel shows only its own trades, taken straight from that account and refreshed every 15 minutes. It fills in by itself; nothing here is typed by hand.</p>
+    </div>
+
+    <div class="instrument live-card" id="lv-card" aria-live="polite">
+      <header>
+        <b><span class="lv-flag" id="lv-flag"></span>Armada, flag B<span class="badge" id="lv-badge" hidden>DEMO</span></b>
+        <span id="lv-updated">Loading the live record…</span>
+      </header>
+      <div class="lv-body" id="lv-body">
+        <div class="lv-empty"><b>Loading…</b></div>
+      </div>
+      <dl class="inst-grid" id="lv-grid">
+        <div><dt>Closed trades</dt><dd id="lv-trades">—</dd></div>
+        <div><dt>Hits</dt><dd id="lv-hits">—</dd></div>
+        <div><dt>Profit factor</dt><dd id="lv-pf">—</dd></div>
+        <div><dt>Max drawdown</dt><dd id="lv-dd">—</dd></div>
+      </dl>
+      <p class="inst-foot" id="lv-foot">Figures are measured against the whole Armada account and use the settings that account runs. Your own risk, broker and costs will give different results. Past performance does not indicate future results.</p>
+    </div>
+
+    <div class="actions" style="margin-top:28px">
+      <a class="btn ink" id="lv-link" href="https://jsgaston.github.io/armada/">See the full record in Armada</a>
+      <span class="aside" style="color:var(--muted)" id="lv-aside">Every statistic, month by month, with Monte Carlo.</span>
+    </div>
+  </div>
+</section>
+
 <section id="results" class="dark">
   <div class="wrap">
     <div class="head">
@@ -548,7 +596,7 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
       </div>
     </div>
 
-    <p class="hint">Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for. Changing broker or account is free: write in and the key is reissued. Software is delivered by email, normally within a few hours and always within one working day. Paying with PayPal? You will be taken to <a href="activate.html">the activation page</a> to send your account number.</p>
+    <p class="hint">Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for. Changing broker or account is free: write to <a href="mailto:licenses@wisfli.com">licenses@wisfli.com</a> and the key is reissued. Software is delivered by email, normally within a few hours and always within one working day. Paying with PayPal? You will be taken to <a href="activate.html">the activation page</a> to send your account number.</p>
   </div>
 </section>
 
@@ -606,7 +654,7 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
     <h2>Questions the page doesn't answer?</h2>
     <div>
       <p>Write to the person who wrote the code. You will get a straight answer about whether it fits your broker, your capital and the way you trade.</p>
-      <p style="margin-top:14px"><a class="mail" href="mailto:jsgastoniriartecabrera@gmail.com">jsgastoniriartecabrera@gmail.com</a></p>
+      <p style="margin-top:14px"><a class="mail" href="mailto:support@wisfli.com">support@wisfli.com</a></p>
     </div>
   </div>
 </section>
@@ -634,7 +682,8 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
           <li><a href="https://wisfli.com/">wisfli.com</a></li>
           <li><a href="https://jsgaston.github.io/candlegrid-web-en/">CandleGrid Pro</a></li>
           <li><a href="https://jsgaston.github.io/armada/">Armada signal</a></li>
-          <li><a href="mailto:jsgastoniriartecabrera@gmail.com">Email</a></li>
+          <li><a href="mailto:support@wisfli.com">Support</a></li>
+          <li><a href="mailto:licenses@wisfli.com">Licences</a></li>
         </ul>
       </div>
     </div>
@@ -669,5 +718,145 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
   }
 </script>
 
+<script>
+/* Live record of this bot inside Armada. Reads the public stats.json that the
+   Armada publisher uploads every 15 minutes, finds the scope under this bot's
+   flag and draws it. Nothing is stored or typed by hand. */
+(function(){
+  var FLAG='B', NAME='RegimeSwitch Pro', BASE='https://jsgaston.github.io/armada/';
+  var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var FLAGS={A:'<path d="M0 0h30v40H0z" fill="#fff"/><path d="M30 0h30L46 20l14 20H30z" fill="#14528C"/>',
+             B:'<path d="M0 0h60L46 20l14 20H0z" fill="#C8322A"/>',
+             C:'<path d="M0 0h60v8H0z" fill="#14528C"/><path d="M0 8h60v8H0z" fill="#fff"/><path d="M0 16h60v8H0z" fill="#C8322A"/><path d="M0 24h60v8H0z" fill="#fff"/><path d="M0 32h60v8H0z" fill="#14528C"/>'};
+  function $(id){return document.getElementById(id);}
+  function nil(v){return v===null||v===undefined||(typeof v==='number'&&isNaN(v));}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function pct(n,d){d=d==null?2:d;return nil(n)?'—':(n>0?'+':(n<0?'−':''))+Math.abs(n).toFixed(d)+'%';}
+  function upct(n,d){return nil(n)?'—':Math.abs(n).toFixed(d==null?1:d)+'%';}
+  function num(n){return nil(n)?'—':(n<0?'−':'')+Math.abs(n).toFixed(2);}
+  function ddp(n){return nil(n)?'—':(n>0?'−'+n.toFixed(2)+'%':'0.00%');}
+  function cls(n){return nil(n)?'':(n>0?'pos':(n<0?'neg':''));}
+  function fdate(iso){var d=new Date(iso+'T00:00:00Z');return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()]+' '+d.getUTCFullYear();}
+  function ftime(ms){var d=new Date(ms);return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()]+' '+String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');}
+  var CUR='EUR';
+  function money(n,sign){ if(nil(n)) return '—';
+    var v=new Intl.NumberFormat('en-IE',{style:'currency',currency:CUR,maximumFractionDigits:2}).format(Math.abs(n));
+    return (n<0?'−':(sign&&n>0?'+':''))+v; }
+
+  /* monotone cubic: smooth, never overshoots. Two points get a soft S with flat ends. */
+  function smooth(P){
+    var n=P.length,i; if(!n) return '';
+    if(n===1) return 'M'+P[0][0].toFixed(1)+' '+P[0][1].toFixed(1);
+    if(n===2){ var h=(P[1][0]-P[0][0])/2; return 'M'+P[0][0].toFixed(1)+' '+P[0][1].toFixed(1)+'C'+(P[0][0]+h).toFixed(1)+' '+P[0][1].toFixed(1)+' '+(P[1][0]-h).toFixed(1)+' '+P[1][1].toFixed(1)+' '+P[1][0].toFixed(1)+' '+P[1][1].toFixed(1); }
+    var dx=[],m=[],t=[];
+    for(i=0;i<n-1;i++){ dx[i]=(P[i+1][0]-P[i][0])||1e-6; m[i]=(P[i+1][1]-P[i][1])/dx[i]; }
+    t[0]=m[0]; t[n-1]=m[n-2];
+    for(i=1;i<n-1;i++) t[i]= m[i-1]*m[i]<=0 ? 0 : 3*(dx[i-1]+dx[i])/((2*dx[i]+dx[i-1])/m[i-1]+(dx[i]+2*dx[i-1])/m[i]);
+    var d='M'+P[0][0].toFixed(1)+' '+P[0][1].toFixed(1);
+    for(i=0;i<n-1;i++){ var k=dx[i]/3;
+      d+='C'+(P[i][0]+k).toFixed(1)+' '+(P[i][1]+t[i]*k).toFixed(1)+' '+(P[i+1][0]-k).toFixed(1)+' '+(P[i+1][1]-t[i+1]*k).toFixed(1)+' '+P[i+1][0].toFixed(1)+' '+P[i+1][1].toFixed(1); }
+    return d;
+  }
+
+  function findScope(s){
+    var sc=s.scopes||[], i;
+    for(i=0;i<sc.length;i++) if(sc[i].flag===FLAG && sc[i].kind==='group') return sc[i];
+    for(i=0;i<sc.length;i++) if(sc[i].flag===FLAG) return sc[i];
+    var st=strategy(s), mg=(st&&st.magics)||[];
+    if(mg.length===1) for(i=0;i<sc.length;i++) if(sc[i].kind==='magic'&&sc[i].magics&&sc[i].magics[0]===mg[0]) return sc[i];
+    return null;
+  }
+  function strategy(s){ var l=s.strategies||[]; for(var i=0;i<l.length;i++) if(l[i].flag===FLAG) return l[i]; return null; }
+
+  /* closed trades once there are a few; hourly equity (open positions included) before that */
+  function series(sc){
+    var tl=sc.tl, n=(tl&&tl.t)?tl.t.length:0, live=sc.live||[];
+    if(n>=6 || (n>=1 && live.length<3)){
+      var pts=[{x:0,v:100}], v=100;
+      for(var i=0;i<n;i++){ v*=1+tl.r[i]/100; pts.push({x:i+1,v:v,r:tl.r[i],t:tl.t[i]*1000}); }
+      pts.kind='trade'; return pts;
+    }
+    if(live.length>=2){ var out=live.map(function(p){return {x:p[0]*1000,v:p[1],t:p[0]*1000};}); out.kind='live'; return out; }
+    var eq=(sc.equity||[]).filter(function(e){return e&&e.d&&!nil(e.v);});
+    if(eq.length>=2){ var ed=eq.map(function(e){var ms=Date.parse(e.d+'T00:00:00Z');return {x:ms,v:+e.v,t:ms};}); ed.kind='day'; return ed; }
+    return [];
+  }
+
+  function chart(sc){
+    var pts=series(sc); if(pts.length<2) return '';
+    var box=$('lv-chartbox'), W=Math.max(300,(box&&box.clientWidth)||560)-24, H=220, PL=6, PR=58, PT=16, PB=26;
+    var vs=pts.map(function(p){return p.v;});
+    var lo=Math.min.apply(null,vs.concat([100])), hi=Math.max.apply(null,vs.concat([100])), pad=(hi-lo)*.18||.2; lo-=pad; hi+=pad;
+    var x0=pts[0].x, x1=pts[pts.length-1].x;
+    var X=function(x){return PL+(x-x0)/((x1-x0)||1)*(W-PL-PR);}, Y=function(v){return PT+(1-(v-lo)/(hi-lo))*(H-PT-PB);};
+    var P=pts.map(function(p){return [X(p.x),Y(p.v)];});
+    var line=smooth(P), area=line+'L'+P[P.length-1][0].toFixed(1)+' '+(H-PB)+'L'+P[0][0].toFixed(1)+' '+(H-PB)+'Z';
+    var up=vs[vs.length-1]>=100, col=up?'#45C29A':'#E8715F';
+    var g='', steps=3;
+    for(var k=0;k<=steps;k++){ var tv=lo+(hi-lo)*k/steps, ty=Y(tv);
+      g+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+ty.toFixed(1)+'" y2="'+ty.toFixed(1)+'" stroke="rgba(214,230,240,.07)"/>'+
+         '<text x="'+(W-PR+8)+'" y="'+(ty+4).toFixed(1)+'" font-family="Archivo" font-size="11.5" fill="#8DA4B4">'+pct(tv-100,2)+'</text>'; }
+    g+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+Y(100).toFixed(1)+'" y2="'+Y(100).toFixed(1)+'" stroke="rgba(214,230,240,.3)" stroke-dasharray="3 4"/>';
+    var dots='';
+    if(pts.kind==='trade' && pts.length<=60) pts.forEach(function(p,i){ if(p.r==null) return;
+      dots+='<circle cx="'+P[i][0].toFixed(1)+'" cy="'+P[i][1].toFixed(1)+'" r="3.2" fill="'+(p.r>=0?'#45C29A':'#E8715F')+'" stroke="#0A2130" stroke-width="1.5"><title>Trade #'+i+': '+pct(p.r,3)+'</title></circle>'; });
+    var fmtT=function(ms){ return pts.kind==='day'?fdate(new Date(ms).toISOString().slice(0,10)):ftime(ms)+' UTC'; };
+    var first=pts.kind==='trade'?'start':fmtT(pts[0].t), last=pts.kind==='trade'?'trade #'+(pts.length-1):fmtT(pts[pts.length-1].t);
+    g+='<text x="'+PL+'" y="'+(H-7)+'" font-family="Archivo" font-size="11.5" fill="#8DA4B4">'+first+'</text>'+
+       '<text x="'+(W-PR)+'" y="'+(H-7)+'" text-anchor="end" font-family="Archivo" font-size="11.5" fill="#8DA4B4">'+last+'</text>';
+    return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(NAME)+' growth curve inside Armada">'+
+      '<defs><linearGradient id="lvg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".26"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'+
+      g+'<path d="'+area+'" fill="url(#lvg)"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'</svg>'+
+      '<p class="lv-cap">'+(pts.kind==='trade'?'Growth after each closed trade, % of the Armada account.':pts.kind==='day'?'Growth at each day\u2019s close, % of the Armada account.':'Hourly equity for this bot, open positions included, % of the Armada account.')+'</p>';
+  }
+
+  var STATE=null;
+  function render(){
+    var s=STATE, body=$('lv-body');
+    if(!s){ body.innerHTML='<div class="lv-empty"><b>The live record could not be loaded right now.</b>It is always available on the Armada page.</div>'; $('lv-updated').textContent='Unavailable'; return; }
+    var A=s.account||{}; if(A.currency) CUR=A.currency;
+    if(A.type==='demo'){ $('lv-badge').hidden=false;
+      $('lv-foot').textContent='The Armada account is currently a demo account, and demo fills are usually kinder than real-money execution. Figures are measured against the whole Armada account and use the settings that account runs; your own risk, broker and costs will give different results. Past performance does not indicate future results.'; }
+    if(s.updated_utc){ var mins=Math.round((Date.now()-new Date(s.updated_utc))/60000);
+      $('lv-updated').textContent='Updated '+(mins<2?'just now':mins<60?mins+' min ago':mins<2880?Math.round(mins/60)+' h ago':Math.round(mins/1440)+' days ago'); }
+    var st=strategy(s), sc=findScope(s);
+    if(!sc || sc.empty){
+      var why = st && st.status==='live' ? NAME+' is sailing in Armada but its figures are not published yet.' :
+        NAME+' has joined the Armada account and has not closed a trade there yet.';
+      body.innerHTML='<div class="lv-empty"><b>No closed trades yet.</b>'+esc(why)+' Its record appears here automatically after the first one.</div>';
+      return;
+    }
+    var R=sc.returns||{}, K=sc.risk||{}, T=sc.trades||{};
+    var money_on=A.publish_money && !nil(sc.net);
+    var big = money_on ? money(sc.net,true) : pct(R.total_pct);
+    var since = T.first_trade ? fdate(T.first_trade) : (st&&st.since?fdate(st.since):'');
+    var side=[];
+    side.push(['Contribution to the account','<span class="'+cls(R.total_pct)+'">'+pct(R.total_pct)+'</span>']);
+    if(!nil(R.month_pct)) side.push(['This month','<span class="'+cls(R.month_pct)+'">'+pct(R.month_pct)+'</span>']);
+    if(!nil(T.expectancy_pct)) side.push(['Average trade','<span class="'+cls(T.expectancy_pct)+'">'+pct(T.expectancy_pct,3)+'</span>']);
+    if(sc.magics && sc.magics.length) side.push([sc.magics.length===1?'Magic number':'Magic numbers', esc(sc.magics.join(', '))]);
+    if(sc.symbols && sc.symbols.length) side.push(['Instruments traded', esc(sc.symbols.map(function(x){return x.s;}).join(', '))]);
+    if(T.last_trade) side.push(['Last closed trade', fdate(T.last_trade)]);
+    body.innerHTML='<div class="inst-big"><span class="num '+cls(money_on?sc.net:R.total_pct)+'">'+big+'</span>'+
+      '<span class="lab">'+(money_on?'net result':'return')+' of '+esc(NAME)+' inside Armada'+(since?', since '+since:'')+'</span>'+
+      '<ul class="lv-side">'+side.map(function(r){return '<li><span>'+r[0]+'</span><b>'+r[1]+'</b></li>';}).join('')+'</ul></div>'+
+      '<div class="lv-chart" id="lv-chartbox"></div>';
+    $('lv-chartbox').innerHTML=chart(sc)||'<div class="lv-empty">Not enough points to draw a curve yet.</div>';
+    $('lv-trades').textContent=nil(T.trades)?'—':T.trades;
+    $('lv-hits').textContent=upct(T.win_rate_pct,1);
+    $('lv-pf').textContent=num(T.profit_factor);
+    $('lv-dd').textContent=ddp(K.max_drawdown_pct);
+    $('lv-link').href=BASE+'#bot='+encodeURIComponent(sc.id);
+    $('lv-link').textContent='See '+NAME+'\u2019s full record in Armada';
+  }
+
+  $('lv-flag').innerHTML=FLAGS[FLAG]?'<svg viewBox="0 0 60 40" aria-hidden="true">'+FLAGS[FLAG]+'</svg>':'';
+  fetch(BASE+'stats.json?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(s){ STATE=s; render(); })
+    .catch(function(){ STATE=null; render(); });
+  var tm; window.addEventListener('resize',function(){ clearTimeout(tm); tm=setTimeout(function(){ if(STATE){ var sc=findScope(STATE), b=$('lv-chartbox'); if(sc&&b) b.innerHTML=chart(sc); } },150); });
+})();
+</script>
 </body>
 </html>
