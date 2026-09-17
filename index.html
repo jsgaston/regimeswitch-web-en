@@ -7,7 +7,7 @@
 <meta name="description" content="An MT5 expert advisor that trains a hidden Markov model on your own chart data, refuses to trade contexts that fail out-of-sample validation, and runs many symbols and timeframes from a single chart.">
 <meta name="theme-color" content="#06141F">
 <meta property="og:title" content="RegimeSwitch Pro — a self-training regime model for MetaTrader 5">
-<meta property="og:description" content="It learns what kind of market it is in before it decides whether to trade. Rules documented, limits stated, licence tied to one account.">
+<meta property="og:description" content="It learns what kind of market it is in before it decides whether to trade. Rules documented, limits stated, and a free build you can test in the Strategy Tester before you buy.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wisfli.com/regimeswitch/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306141F'/><rect x='4' y='6' width='8' height='20' fill='%2345C29A' opacity='.6'/><rect x='12' y='6' width='8' height='20' fill='%23E8715F' opacity='.6'/><rect x='20' y='6' width='8' height='20' fill='%238DA4B4' opacity='.6'/></svg>">
@@ -334,7 +334,7 @@ footer .legal strong{color:var(--dmuted)}
         <a class="btn brass" href="#pricing">See pricing</a>
         <a class="btn line" href="#results">Read the test report</a>
       </div>
-      <p class="aside" style="margin:18px 0 0">MetaTrader 5, one licence per account, Stripe or PayPal</p>
+      <p class="aside" style="margin:18px 0 0">MetaTrader 5 &middot; one licence covers 3 live and 3 demo accounts &middot; free build for the Strategy Tester</p>
     </div>
 
     <aside class="instrument" aria-label="What the model produces">
@@ -475,6 +475,8 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
           <tr><th scope="row">Spread guard</th><td>Entries are skipped when the spread is above your limit, which matters at rollover and on news.</td></tr>
           <tr><th scope="row">Exits</th><td>Stop, target, trailing stop, opposite reversal signal, or a flip in the model's direction, each switchable.</td></tr>
           <tr><th scope="row">On-chart panel</th><td>A live summary of the busiest contexts: state, probability, edge and open positions.</td></tr>
+          <tr><th scope="row">Licence</th><td>One key covers 3 live accounts and 3 demo accounts at the same time. You add and free accounts yourself at <a href="https://api.wisfli.com/manage">api.wisfli.com/manage</a>.</td></tr>
+          <tr><th scope="row">Strategy Tester</th><td>A separate build runs in the tester with no key and no purchase, so you can measure it on your own broker’s data first.</td></tr>
         </tbody>
       </table>
     </div>
@@ -563,40 +565,48 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
         <h3>Monthly</h3>
         <p class="who">For running it live without committing up front.</p>
         <p class="price">€39<small> / month</small></p>
-        <p class="was">Cancel any time, from your own Stripe or PayPal receipt.</p>
+        <p class="was">VAT included. Cancel any time from your Stripe receipt.</p>
         <ul>
-          <li>One MetaTrader 5 account</li>
-          <li>All updates while active</li>
+          <li>3 live accounts and 3 demo accounts</li>
+          <li>All updates while the subscription is active</li>
           <li>Email support</li>
-          <li>Free account transfer</li>
+          <li>Accounts managed by you, at any time</li>
         </ul>
         <div class="pay-slot">
-          <div id="paypal-button-container-P-2EA83729XE4434916NKTILZI"></div>
+          <a class="btn brass" href="https://buy.stripe.com/9B66oA0S75Uz4mE4kH7ss05">Subscribe &mdash; €39 / month</a>
         </div>
       </div>
 
       <div class="plan pick">
-        <span class="tag">Launch price</span>
         <h3>Lifetime licence</h3>
-        <p class="who">For traders who have run it on demo and want to keep it.</p>
-        <p class="price">€249<small> once</small></p>
-        <p class="was">Going to €329 after the first ten licences.</p>
+        <p class="who">For traders who have tested it and want to keep it.</p>
+        <p class="price">€349<small> once</small></p>
+        <p class="was">VAT included. One payment, no renewal, no expiry.</p>
         <ul>
-          <li>One MetaTrader 5 account, no expiry</li>
+          <li>3 live accounts and 3 demo accounts, no expiry</li>
           <li>All version 2.x updates included</li>
           <li>Priority email support</li>
-          <li>Free account transfer</li>
+          <li>Accounts managed by you, at any time</li>
         </ul>
         <div class="pay-slot">
-          <stripe-buy-button
-            buy-button-id="buy_btn_1UFBRf9abIQixlisOyLEXGhu"
-            publishable-key="pk_live_51TZyif9abIQixliscbpfVG3y2wD28GUvAfE7BnvbENBMOyUQMqE4Dh954G2zII0HNpZ6dTZxUJg4kpncQrUL266Z00nJ9nMGOT">
-          </stripe-buy-button>
+          <a class="btn brass" href="https://buy.stripe.com/fZu00c0S7aaP6uM9F17ss04">Buy once &mdash; €349</a>
         </div>
       </div>
     </div>
 
-    <p class="hint">Your licence key is tied to one MetaTrader 5 account number, which the checkout asks for. Changing broker or account is free: write to <a href="mailto:licenses@wisfli.com">licenses@wisfli.com</a> and the key is reissued. Software is delivered by email, normally within a few hours and always within one working day. Paying with PayPal? You will be taken to <a href="activate.html">the activation page</a> to send your account number.</p>
+    <p class="hint">The checkout asks for your email address and nothing else. Your licence key and the expert advisor arrive by email from <a href="mailto:licenses@wisfli.com">licenses@wisfli.com</a> within a few minutes of the payment clearing. You register your account numbers yourself at <a href="https://api.wisfli.com/manage">api.wisfli.com/manage</a>, where you can also free a slot when you move broker and, on the monthly plan, cancel.</p>
+
+    <div class="head" style="margin-top:56px">
+      <h2>How the licence works</h2>
+      <p>No trial keys and no licence tied to a single account number. You test it for free in the tester, and a paid key runs on six accounts of your choosing.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Test it for free, with no key</b><p>The backtest build runs in the MetaTrader 5 Strategy Tester on your own broker’s data and history. It refuses to run on a live or demo chart, and it needs no purchase and no key. That is the trial.</p></li>
+      <li><b>Buy with your email address</b><p>Stripe collects the payment and your email. There is no account number to send and no form to fill in afterwards.</p></li>
+      <li><b>The key and the file arrive by email</b><p>A key in the form <code>WSF-...</code> and the full expert advisor, sent automatically from <a href="mailto:licenses@wisfli.com">licenses@wisfli.com</a>. Nothing is downloaded from this page.</p></li>
+      <li><b>Six accounts, managed by you</b><p>The same key runs on 3 live accounts and 3 demo accounts at once. You add them and free them at <a href="https://api.wisfli.com/manage">api.wisfli.com/manage</a>, whenever you like, without writing to anyone.</p></li>
+      <li><b>The terminal checks the key online</b><p>The expert advisor verifies the key against <a href="https://api.wisfli.com">api.wisfli.com</a> when it starts and every few hours. A short outage changes nothing: it keeps working from the last valid check. If the licence stops being valid it will still manage and close positions that are already open, but it will not open new ones.</p></li>
+    </ol>
   </div>
 </section>
 
@@ -604,8 +614,9 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
   <div class="wrap">
     <div class="head solo"><h2>From payment to first signal</h2></div>
     <ol class="steps">
-      <li><b>Pay and send your account number</b><p>Stripe asks for it at checkout. If you pay with PayPal, the confirmation page collects it instead. It is the login number of the MT5 account you want to run, demo or live.</p></li>
-      <li><b>Drop the file into MQL5/Experts and restart</b><p>The compiled <a href="HMM_Regime_MultiEA_v20.ex5">.ex5</a> goes in the Experts folder of your terminal's data directory. Refresh the Navigator and it appears.</p></li>
+      <li><b>Measure it in the tester first</b><p>Download the <a href="RegimeSwitchPro-Backtest.ex5">free backtest build</a>, drop it into the Experts folder and run it in the Strategy Tester with your broker’s spreads and commissions. No key, no purchase.</p></li>
+      <li><b>Drop the file into MQL5/Experts and restart</b><p>The expert advisor that comes with your purchase email goes in the Experts folder of your terminal’s data directory. Refresh the Navigator and it appears.</p></li>
+      <li><b>Allow the licence check</b><p>In Tools &rarr; Options &rarr; Expert Advisors, tick <i>Allow WebRequest for listed URL</i> and add <code>https://api.wisfli.com</code>. Without it the terminal blocks the check and the robot will not trade.</p></li>
       <li><b>Paste the key and pick your universe</b><p>One key field, one symbol spec string. Start with the default: majors, reversal with regime veto, 1% risk.</p></li>
       <li><b>Let it warm up</b><p>Each context trains once before it can trade, one at a time so the terminal stays responsive. On a full universe allow a few minutes. The journal table tells you exactly where it is.</p></li>
       <li><b>Watch the journal before you go live</b><p>The hourly table shows which contexts passed validation and which are sitting out. If most of your universe is sitting out, that is information, not a fault.</p></li>
@@ -638,12 +649,24 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
         <p>Every 250 bars each context refits on the most recent window and revalidates. A setup that worked last quarter and stopped working drops out of the tradable set on its own. That is the entire point of the design.</p>
       </details>
       <details>
-        <summary>Is there a refund?</summary>
-        <p>Licence keys cannot be recalled once issued, so purchases are final. That is exactly why the test report is published unedited, the rules are documented, and you are told to run a demo first. If something does not work as described, write in and it gets fixed.</p>
+        <summary>Can I try it before paying?</summary>
+        <p>Yes, in the Strategy Tester. The <a href="RegimeSwitchPro-Backtest.ex5">backtest build</a> is the same robot with the same rules, free and without a key, and it will only run inside the tester. Demo accounts need a paid licence, because a demo account is the robot actually running. If you want to see it working on a live account, the Armada panel above is that, updated every 15 minutes.</p>
       </details>
       <details>
-        <summary>Will you sell me a copy without the licence check?</summary>
-        <p>No.</p>
+        <summary>Does it need an internet connection?</summary>
+        <p>Yes, to check the licence when it starts and every few hours after that. You have to allow <code>https://api.wisfli.com</code> in Tools &rarr; Options &rarr; Expert Advisors &rarr; Allow WebRequest for listed URL. A short outage is not a problem: the last valid check is trusted for a while, so a dropped connection or a server restart will not shut you down mid-position.</p>
+      </details>
+      <details>
+        <summary>How many accounts does one licence cover?</summary>
+        <p>Three live accounts and three demo accounts at the same time, added and removed by you at <a href="https://api.wisfli.com/manage">api.wisfli.com/manage</a>. Change broker, free the old slot and register the new number. Nobody has to approve it.</p>
+      </details>
+      <details>
+        <summary>Is there a refund?</summary>
+        <p>Licence keys cannot be recalled once issued, so purchases are final. That is exactly why the backtest build is free, the test report is published unedited and the rules are documented: everything you need to decide is available before you pay. If something does not work as described, write in and it gets fixed.</p>
+      </details>
+      <details>
+        <summary>Can I pass the file on to someone else?</summary>
+        <p>The file is useless without a key, and a key runs on six accounts that you register. Sharing it just uses up your own slots. Keys found in circulation are revoked.</p>
       </details>
     </div>
   </div>
@@ -671,7 +694,7 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
       <div>
         <h4>RegimeSwitch Pro</h4>
         <ul>
-          <li><a href="activate.html">Activate a purchase</a></li>
+          <li><a href="https://api.wisfli.com/manage">Manage your licence</a></li>
           <li><a href="terms.html">Terms and licence</a></li>
           <li><a href="ReportTester-27085970.html">Strategy Tester report</a></li>
         </ul>
@@ -695,28 +718,6 @@ InpSuffix     = <span class="s">""</span>;        <span class="c">// ".ecn", "m"
 </footer>
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
-
-<!-- Payment buttons.
-     disable-funding=card,credit stops PayPal injecting its floating menu over the sticky header. -->
-<script src="https://js.stripe.com/v3/buy-button.js" async></script>
-<script src="https://www.paypal.com/sdk/js?client-id=AWa_6Af93UGQdocFcdOmDgC6xGjFV4Kp-8yeFyZ6DhHqPDnHt6kK5xQdSenwitI1-a0kk4Sc4DeCYK9N&vault=true&intent=subscription&currency=EUR&disable-funding=card,credit" data-sdk-integration-source="button-factory"></script>
-<script>
-  if (window.paypal) {
-    paypal.Buttons({
-      fundingSource: paypal.FUNDING.PAYPAL,
-      style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
-      createSubscription: function (data, actions) {
-        return actions.subscription.create({ plan_id: 'P-2EA83729XE4434916NKTILZI' });
-      },
-      onApprove: function (data) {
-        window.location.href = 'activate.html?sub=' + encodeURIComponent(data.subscriptionID);
-      },
-      onError: function (err) {
-        console.error('PayPal:', err);
-      }
-    }).render('#paypal-button-container-P-2EA83729XE4434916NKTILZI');
-  }
-</script>
 
 <script>
 /* Live record of this bot inside Armada. Reads the public stats.json that the
